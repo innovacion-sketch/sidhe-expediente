@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sidhe — Expediente Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ── RESET & VARIABLES ──────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F5F2;--surface:#FFFFFF;--surface2:#F0EDE8;--surface3:#E8E4DE;
+  --accent:#1B3A4B;--accent2:#C97B45;--accent-light:#E8F4F8;--accent-border:rgba(27,58,75,0.2);
+  --text:#1A1A1A;--text2:#5A5A5A;--text3:#9A9A9A;
+  --border:#DDD8D0;--border2:#C8C2B8;
+  --green:#2D6A4F;--green-bg:#D8F3DC;--green-border:#2D6A4F;
+  --red:#A4262C;--red-bg:#FDE8E8;
+  --radius:10px;--radius-lg:16px;--radius-xl:20px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* ── BASE ───────────────────────────────────────────────────── */
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.app{max-width:980px;margin:0 auto;padding:1.5rem}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.header{background:var(--accent);border-radius:var(--radius-xl);padding:1.5rem 2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;box-shadow:0 4px 24px rgba(27,58,75,0.25)}
+.logo-box{width:54px;height:54px;background:white;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-box svg{width:34px;height:34px}
+.header-text h1{font-family:'DM Serif Display',serif;font-size:22px;color:white;font-weight:400;letter-spacing:-0.3px}
+.header-text p{font-size:13px;color:rgba(255,255,255,0.55);margin-top:3px}
+.header-right{margin-left:auto;text-align:right}
+.date-big{font-size:17px;font-weight:600;color:white}
+.date-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
+.sucursal-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 12px;margin-top:8px;cursor:pointer;transition:background 0.2s}
+.sucursal-badge:hover{background:rgba(255,255,255,0.18)}
+.sucursal-badge span{font-size:12px;color:rgba(255,255,255,0.85);font-weight:500}
+.sucursal-badge svg{width:12px;height:12px;stroke:rgba(255,255,255,0.6)}
+
+/* ── PROGRESS ───────────────────────────────────────────────── */
+.progress-wrap{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);margin-bottom:1.5rem;overflow:hidden;box-shadow:var(--shadow)}
+.progress-bar-track{height:3px;background:var(--surface2)}
+.progress-bar-fill{height:3px;background:var(--accent2);transition:width 0.45s cubic-bezier(0.4,0,0.2,1)}
+.steps-row{display:flex}
+.step-tab{flex:1;padding:13px 10px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text3);font-weight:500;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:5px;transition:all 0.2s;border-bottom:2px solid transparent;white-space:nowrap}
+.step-tab:last-child{border-right:none}
+.step-icon{width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);transition:all 0.2s}
+.step-tab.active{color:var(--accent);border-bottom-color:var(--accent2)}
+.step-tab.active .step-icon{background:var(--accent);color:white}
+.step-tab.done{color:var(--green)}
+.step-tab.done .step-icon{background:var(--green-bg);color:var(--green)}
+
+/* ── PANELS ─────────────────────────────────────────────────── */
+.panel{display:none;animation:fadeUp 0.25s ease}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ──────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.card-title{font-family:'DM Serif Display',serif;font-size:21px;color:var(--accent);font-weight:400;letter-spacing:-0.2px}
+.card-sub{font-size:13px;color:var(--text3);margin-top:4px}
+.card-badge{background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;border:1px solid var(--accent-border)}
+
+/* ── FORM ELEMENTS ──────────────────────────────────────────── */
+.form-grid{display:grid;gap:16px;margin-bottom:16px}
+.cols2{grid-template-columns:1fr 1fr}
+.cols3{grid-template-columns:1fr 1fr 1fr}
+.cols1{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px}
+.field input,.field select{font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);transition:border 0.2s,background 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(27,58,75,0.09)}
+
+/* ── SECTION DIVIDER ─────────────────────────────────────────── */
+.sdiv{display:flex;align-items:center;gap:12px;margin:1.5rem 0 1rem}
+.sdiv span{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;white-space:nowrap}
+.sdiv::before,.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── CHECKBOXES ─────────────────────────────────────────────── */
+.checks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.check-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--surface2);transition:all 0.15s;user-select:none;-webkit-user-select:none}
+.check-item:active{transform:scale(0.98)}
+.check-item.checked{background:var(--accent-light);border-color:var(--accent)}
+.check-item input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.check-item span{font-size:13px;color:var(--text);line-height:1.3}
+
+/* ── DOLOR ──────────────────────────────────────────────────── */
+.dolor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dolor-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.dolor-name{font-size:13px;font-weight:500;color:var(--text)}
+.side-btns{display:flex;gap:6px}
+.side-btn{padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.side-btn.on{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+
+/* ── DOCUMENT SCROLL ─────────────────────────────────────────── */
+.doc-scroll{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;max-height:240px;overflow-y:auto;margin-bottom:1rem}
+.doc-scroll::-webkit-scrollbar{width:4px}
+.doc-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.doc-text{font-size:13px;color:var(--text2);line-height:1.85}
+.doc-text p{margin-bottom:0.75rem}
+.doc-text p:last-child{margin-bottom:0}
+.doc-text strong{color:var(--text);font-weight:600}
+
+/* ── SIGNATURE ──────────────────────────────────────────────── */
+.sig-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem}
+.sig-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px}
+.sig-name-input{width:100%;font-family:'DM Serif Display',serif;font-size:17px;font-style:italic;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:white;color:var(--accent);margin-bottom:10px;outline:none;letter-spacing:0.3px}
+.sig-name-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(27,58,75,0.09)}
+.canvas-wrap{border:1px dashed var(--border2);border-radius:var(--radius);background:white;overflow:hidden;position:relative}
+.canvas-wrap canvas{display:block;touch-action:none;cursor:crosshair;width:100%}
+.canvas-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;color:var(--text3);pointer-events:none;text-align:center;transition:opacity 0.3s}
+.sig-actions{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.sig-actions span{font-size:12px;color:var(--text3)}
+
+/* ── ACCEPT ROW ─────────────────────────────────────────────── */
+.accept-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--accent-light);border:1px solid var(--accent-border);border-radius:var(--radius);margin-bottom:1rem;cursor:pointer}
+.accept-row input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.accept-row label{font-size:14px;color:var(--accent);font-weight:500;cursor:pointer}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:11px 22px;border-radius:var(--radius);border:1px solid var(--border);background:white;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.btn:hover{background:var(--surface2);color:var(--text)}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn-primary:hover{background:#152f3e;color:white}
+.btn-danger{background:var(--red-bg);border-color:var(--red);color:var(--red);font-size:12px;padding:7px 14px}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25D366;border:none;border-radius:var(--radius);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
+.btn-wa:active{opacity:0.85}
+.btn-drive{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
+.btn-drive:active{opacity:0.85}
+.btn-drive.loading{opacity:0.7;pointer-events:none}
+.btn-drive.success{background:var(--green)}
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+
+/* ── SUMMARY ─────────────────────────────────────────────────── */
+.summary-header{text-align:center;padding:1.5rem 0 1rem}
+.check-circle{width:64px;height:64px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:28px}
+.summary-header h2{font-family:'DM Serif Display',serif;font-size:26px;color:var(--accent);font-weight:400}
+.summary-header p{font-size:14px;color:var(--text3);margin-top:6px}
+.sum-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:10px}
+.sum-card h4{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sum-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px}
+.sum-key{color:var(--text3)}
+.sum-val{color:var(--text);font-weight:500;text-align:right;max-width:60%}
+.signed-pill{background:var(--green-bg);color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid rgba(45,106,79,0.25)}
+.drive-status{font-size:13px;text-align:center;padding:8px 12px;border-radius:var(--radius);margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.drive-status.pending{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.drive-status.uploading{background:#EEF4FF;color:#3B5BDB;border:1px solid #BAC8FF}
+.drive-status.done{background:var(--green-bg);color:var(--green);border:1px solid rgba(45,106,79,0.3)}
+.drive-status.error{background:var(--red-bg);color:var(--red);border:1px solid rgba(164,38,44,0.3)}
+
+/* ── MODAL SUCURSAL ──────────────────────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:white;border-radius:var(--radius-xl);padding:2rem;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);margin-bottom:6px}
+.modal p{font-size:13px;color:var(--text3);margin-bottom:1.25rem}
+.modal .field{margin-bottom:1rem}
+.modal select{width:100%}
+</style>
+</head>
+<body>
+
+<!-- MODAL SELECTOR DE SUCURSAL -->
+<div class="modal-bg open" id="modal-sucursal">
+  <div class="modal">
+    <h3>Bienvenido a Sidhe</h3>
+    <p>Selecciona tu sucursal para continuar</p>
+    <div class="field">
+      <label>Sucursal</label>
+      <select id="select-sucursal">
+        <option value="">— Seleccionar —</option>
+        <option>Liverpool Santa Fe</option>
+        <option>Liverpool Perisur</option>
+        <option>Liverpool Insurgentes</option>
+        <option>Liverpool Satélite</option>
+        <option>Liverpool Polanco</option>
+        <option>Liverpool Interlomas</option>
+        <option>Liverpool Coapa</option>
+        <option>Liverpool Lindavista</option>
+        <option>Liverpool Perinorte</option>
+        <option>Liverpool Tlalnepantla</option>
+        <option>Liverpool Ecatepec</option>
+        <option>Liverpool Texcoco</option>
+        <option>Liverpool Cuicuilco</option>
+        <option>Liverpool Toreo</option>
+        <option>Liverpool Atizapán</option>
+        <option>Liverpool Coacalco</option>
+        <option>Liverpool Ixtapaluca</option>
+        <option>Liverpool Metepec</option>
+        <option>Liverpool Toluca</option>
+        <option>Liverpool Querétaro</option>
+        <option>Liverpool Puebla</option>
+        <option>Liverpool Angelópolis</option>
+        <option>Liverpool Guadalajara</option>
+        <option>Liverpool Galerías GDL</option>
+        <option>Liverpool Andares</option>
+        <option>Liverpool Monterrey</option>
+        <option>Liverpool Valle Oriente</option>
+        <option>Liverpool Tijuana</option>
+        <option>Liverpool Cancún</option>
+        <option>Liverpool Mérida</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="setSucursal()">Entrar</button>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-box">
+    <svg viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" fill="#1B3A4B"/>
+      <path d="M12 20 Q20 10 28 20 Q20 30 12 20Z" fill="#C97B45" opacity="0.9"/>
+      <circle cx="20" cy="20" r="3" fill="white"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <h1>Expediente Digital</h1>
+    <p>SIDHEGRAF S.A. de C.V.</p>
+  </div>
+  <div class="header-right">
+    <div class="date-big" id="fecha-display"></div>
+    <div class="date-sub">Fecha de consulta</div>
+    <div class="sucursal-badge" onclick="document.getElementById('modal-sucursal').classList.add('open')">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M8 9a3 3 0 100-6 3 3 0 000 6z"/><path d="M3 14s1-2 5-2 5 2 5 2"/></svg>
+      <span id="sucursal-label">Seleccionar sucursal</span>
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="steps-row">
+    <button class="step-tab active" onclick="goTo(0)" id="step0"><div class="step-icon">1</div>Datos</button>
+    <button class="step-tab" onclick="goTo(1)" id="step1"><div class="step-icon">2</div>Consentimiento</button>
+    <button class="step-tab" onclick="goTo(2)" id="step2"><div class="step-icon">3</div>Instrucciones</button>
+    <button class="step-tab" onclick="goTo(3)" id="step3"><div class="step-icon">4</div>Privacidad</button>
+    <button class="step-tab" onclick="goTo(4)" id="step4"><div class="step-icon">✓</div>Finalizar</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 0 — DATOS DEL CLIENTE
+═════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel0">
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Datos del cliente</div><div class="card-sub">Registro clínico y evaluación inicial</div></div>
+    <div class="card-badge">Sección 1 de 4</div>
+  </div>
+  <div class="form-grid cols2">
+    <div class="field"><label>Especialista</label><input id="especialista" placeholder="Nombre del especialista"/></div>
+    <div class="field"><label>Fecha de consulta</label><input id="fecha" type="date"/></div>
+  </div>
+  <div class="sdiv"><span>Información personal</span></div>
+  <div class="form-grid cols2">
+    <div class="field"><label>Nombre completo</label><input id="nombre" placeholder="Nombre del cliente"/></div>
+    <div class="field"><label>Edad</label><input id="edad" type="number" placeholder="Años" min="1" max="120"/></div>
+  </div>
+  <div class="form-grid cols2">
+    <div class="field"><label>Teléfono WhatsApp</label><input id="tel" placeholder="55 1234 5678" inputmode="numeric"/></div>
+    <div class="field"><label>Ocupación</label><input id="ocup" placeholder="Ocupación"/></div>
+  </div>
+  <div class="form-grid cols3">
+    <div class="field"><label>Actividad física</label><input id="actfis" placeholder="p. ej. caminar"/></div>
+    <div class="field"><label>Estatura</label><input id="estatura" placeholder="1.70 m"/></div>
+    <div class="field"><label>Peso</label><input id="peso" placeholder="70 kg"/></div>
+  </div>
+  <div class="form-grid cols1"><div class="field"><label>¿Cómo se enteró de nosotros?</label><input id="enterado" placeholder="Redes sociales, recomendación, Liverpool..."/></div></div>
+
+  <div class="sdiv"><span>Motivo de visita</span></div>
+  <div class="checks-grid" id="motivos">
+    <label class="check-item"><input type="checkbox" value="Uso previo de plantillas"><span>Uso previo de plantillas</span></label>
+    <label class="check-item"><input type="checkbox" value="Fascitis plantar"><span>Fascitis plantar</span></label>
+    <label class="check-item"><input type="checkbox" value="Pie plano"><span>Pie plano</span></label>
+    <label class="check-item"><input type="checkbox" value="Juanetes"><span>Juanetes</span></label>
+    <label class="check-item"><input type="checkbox" value="Asimetría"><span>Asimetría</span></label>
+    <label class="check-item"><input type="checkbox" value="Pie cavo"><span>Pie cavo</span></label>
+  </div>
+  <div class="form-grid cols1" style="margin-top:12px"><div class="field"><label>Otro motivo</label><input id="otro-motivo" placeholder="Especificar si aplica..."/></div></div>
+
+  <div class="sdiv"><span>Zonas de dolor</span></div>
+  <div class="dolor-grid">
+    <div class="dolor-card"><span class="dolor-name">Rodilla</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Rodilla izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Rodilla der')">Der</button></div></div>
+    <div class="dolor-card"><span class="dolor-name">Cadera</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Cadera izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Cadera der')">Der</button></div></div>
+    <div class="dolor-card"><span class="dolor-name">Espalda</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Espalda izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Espalda der')">Der</button></div></div>
+    <div class="dolor-card"><span class="dolor-name">Pies</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Pies izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Pies der')">Der</button></div></div>
+    <div class="dolor-card"><span class="dolor-name">Tobillos</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Tobillos izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Tobillos der')">Der</button></div></div>
+  </div>
+
+  <div class="sdiv"><span>Valoración clínica</span></div>
+  <div class="checks-grid" id="valoracion">
+    <label class="check-item"><input type="checkbox" value="Varo de rodillas"><span>Varo de rodillas</span></label>
+    <label class="check-item"><input type="checkbox" value="Valgo de rodillas"><span>Valgo de rodillas</span></label>
+    <label class="check-item"><input type="checkbox" value="Valgo del retropié"><span>Valgo del retropié</span></label>
+    <label class="check-item"><input type="checkbox" value="Varo del retropié"><span>Varo del retropié</span></label>
+    <label class="check-item"><input type="checkbox" value="Pronación"><span>Pronación</span></label>
+    <label class="check-item"><input type="checkbox" value="Supinación"><span>Supinación</span></label>
+  </div>
+
+  <div class="sdiv"><span>Datos de plantilla</span></div>
+  <div class="form-grid cols3">
+    <div class="field"><label>Tipo de calzado</label><input id="tipo-calzado" placeholder="p. ej. tenis"/></div>
+    <div class="field"><label>Número de plantilla</label><input id="num-plantilla" placeholder="p. ej. 26"/></div>
+    <div class="field"><label>Horma</label><input id="horma" placeholder="p. ej. estándar"/></div>
+  </div>
+  <div class="nav-row"><div></div><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 1 — CONSENTIMIENTO
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel1">
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Consentimiento informado</div><div class="card-sub">SIDHEGRAF S.A. de C.V. — Ortesis plantares personalizadas</div></div>
+    <div class="card-badge">Sección 2 de 4</div>
+  </div>
+  <div class="doc-scroll"><div class="doc-text">
+    <p>Yo, en forma voluntaria y en pleno uso de mis funciones mentales, consiento que SIDHEGRAF S.A. de C.V. me realice la toma de estudios y me prescriba una ortesis plantar (plantillas) a medida y personalizada.</p>
+    <p><strong>Primero.</strong> Entiendo que si no informo adecuadamente al especialista de mis antecedentes, se puede ocasionar confusión en el diagnóstico o error en la selección del tratamiento.</p>
+    <p><strong>Segundo.</strong> La práctica de la podología no es una ciencia exacta. El especialista busca los mejores resultados para modificar o normalizar los aspectos funcionales del sistema musculoesquelético. El tratamiento puede no alcanzar totalmente los resultados esperados y puede requerir pequeños ajustes posteriores.</p>
+    <p><strong>Tercero.</strong> Pueden presentarse complicaciones que requieran pruebas complementarias (radiografías, ecografías, TAC, resonancia, etc.) que deberán atenderse con un médico especialista.</p>
+    <p><strong>Cuarto.</strong> El tratamiento se realiza personalizado al pie. En ningún momento se devolverá el importe pagado. El calzado debe adaptarse a la plantilla y ésta al pie.</p>
+    <p><strong>Quinto.</strong> Para hacer válida la garantía (60 días), debo hacer uso correcto de las plantillas, con un periodo de adaptación de 4 semanas de uso progresivo.</p>
+    <p><strong>Sexto.</strong> La garantía inicia 5 días después de la entrega en sucursal y se hace válida máximo 3 veces (lun–vie 11am–7pm).</p>
+    <p><strong>Séptimo.</strong> Para recoger las plantillas debo presentar ticket o identificación oficial. Si en un mes no se recogen, se llevarán a Calz. Gral. Mariano Escobedo 438, Polanco, Anzures, piso 5 (lun–vie 9am–6pm).</p>
+  </div></div>
+  <div class="form-grid cols3">
+    <div class="field"><label>Talla</label><input id="talla" placeholder="p. ej. 26"/></div>
+    <div class="field"><label>Tipo de calzado</label><input id="calzado-cons" placeholder="p. ej. tenis"/></div>
+    <div class="field"><label>Día de entrega estimado</label><input id="entrega" type="date"/></div>
+  </div>
+  <div class="sig-section">
+    <div class="sig-label">Firma del cliente — Consentimiento informado</div>
+    <input class="sig-name-input" id="sig-nombre-cons" placeholder="Escribir nombre completo..."/>
+    <div class="canvas-wrap"><canvas id="canvas-cons" height="150"></canvas><div class="canvas-hint" id="hint-cons">Firmar aquí con el dedo o mouse</div></div>
+    <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-cons','hint-cons')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
+  </div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 2 — INSTRUCCIONES
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel2">
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Instrucciones de uso y cuidado</div><div class="card-sub">El cliente confirma haber leído y comprendido las instrucciones</div></div>
+    <div class="card-badge">Sección 3 de 4</div>
+  </div>
+  <div class="doc-scroll"><div class="doc-text">
+    <p>• Usar las plantillas de manera paulatina. Comenzar con 2 o 3 horas e ir incrementando conforme el cuerpo se adapte, hasta usarlas todo el día.</p>
+    <p>• Es normal sentir incomodidad o ligeros dolores musculoesqueléticos al principio. Las molestias deben desaparecer conforme avance la adaptación.</p>
+    <p>• El periodo de adaptación va de 3 a 4 semanas. En personas muy sensibles puede durar hasta 6 semanas.</p>
+    <p>• Colocar las plantillas acomodando primero la punta. Asegurarse de que no se muevan ni se arruguen.</p>
+    <p>• Limpiar con una esponja y un poco de jabón. No exponer a flamas, disolventes o productos agresivos.</p>
+    <p>• Evitar usar con los pies descalzos.</p>
+    <p>• Tips: No usar en suelas desgastadas. Quitar la plantilla de fábrica del calzado. No usar tacones mayores de 2.5 cm (hombres) o 4 cm (mujeres). No usar calzado con horma excesivamente estrecha.</p>
+    <p><strong>Precauciones:</strong> No abusar durante la fase inicial (puede causar irritación y ampollas). Si cambia de zapatos, las plantillas pueden no ajustar. La adaptación debe hacerse progresivamente; evitar deportes o caminatas fuertes sin haber completado la adaptación.</p>
+  </div></div>
+  <div class="sig-section">
+    <div class="sig-label">Firma del cliente — Instrucciones de uso</div>
+    <input class="sig-name-input" id="sig-nombre-inst" placeholder="Escribir nombre completo..."/>
+    <div class="canvas-wrap"><canvas id="canvas-inst" height="150"></canvas><div class="canvas-hint" id="hint-inst">Firmar aquí con el dedo o mouse</div></div>
+    <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-inst','hint-inst')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
+  </div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 3 — PRIVACIDAD
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel3">
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Aviso de privacidad</div><div class="card-sub">Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V.</div></div>
+    <div class="card-badge">Sección 4 de 4</div>
+  </div>
+  <div class="doc-scroll"><div class="doc-text">
+    <p>Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V. (el "Responsable"), con domicilio en calle Mario Pani núm. 200, Col. Santa Fe Cuajimalpa, C.P. 05348, Ciudad de México, utilizarán sus datos personales de identificación y datos sensibles (estado de salud) con las finalidades:</p>
+    <p>• Verificar su identidad e información.<br>• Integrar su expediente clínico.<br>• Actualizar su información en la base de datos.<br>• Prestar los servicios solicitados y llevar a cabo la venta de productos solicitados.</p>
+    <p>Para mayor información consulte el Aviso de Privacidad Integral en <strong>www.liverpool.com.mx</strong> → sección Avisos de Privacidad.</p>
+  </div></div>
+  <label class="accept-row">
+    <input type="checkbox" id="acepto-priv" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+    <label for="acepto-priv" style="font-size:14px;color:var(--accent);font-weight:500;cursor:pointer">He leído y acepto el aviso de privacidad</label>
+  </label>
+  <div class="sig-section">
+    <div class="sig-label">Nombre y firma del cliente — Aviso de privacidad</div>
+    <input class="sig-name-input" id="sig-nombre-priv" placeholder="Escribir nombre completo..."/>
+    <div class="canvas-wrap"><canvas id="canvas-priv" height="150"></canvas><div class="canvas-hint" id="hint-priv">Firmar aquí con el dedo o mouse</div></div>
+    <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-priv','hint-priv')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
+  </div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="goTo(4);buildSummary()">Ver resumen →</button></div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 4 — FINALIZAR
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel4">
+<div class="card">
+  <div class="summary-header">
+    <div class="check-circle">✓</div>
+    <h2>Expediente completado</h2>
+    <p id="summary-subtitle">Los 4 documentos han sido firmados.</p>
+  </div>
+  <div id="summary-content"></div>
+  <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+
+    <!-- Estado Drive -->
+    <div class="drive-status pending" id="drive-status">
+      Listo para guardar en Google Drive
+    </div>
+
+    <!-- Botón Drive -->
+    <button class="btn-drive" id="btn-drive" onclick="subirDrive()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Guardar expediente en Google Drive
+    </button>
+
+    <!-- Botón WhatsApp -->
+    <button class="btn-wa" onclick="sendWhatsApp()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar resumen al cliente por WhatsApp
+    </button>
+
+  </div>
+  <div class="nav-row">
+    <button class="btn" onclick="prev()">← Anterior</button>
+    <button class="btn btn-primary" onclick="resetAll()">+ Nuevo cliente</button>
+  </div>
+</div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── CONFIGURACIÓN ────────────────────────────────────────────
+// 👇 Reemplaza esta URL con la que te da Google Apps Script al desplegar
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/REEMPLAZA_CON_TU_URL/exec";
+// ────────────────────────────────────────────────────────────
+
+var currentStep = 0;
+var dolorSelected = [];
+var sucursalActual = "";
+
+// Fecha
+var today = new Date();
+var dd    = String(today.getDate()).padStart(2,'0');
+var mm    = String(today.getMonth()+1).padStart(2,'0');
+var yyyy  = today.getFullYear();
+var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+document.getElementById('fecha-display').textContent = dd + ' ' + meses[today.getMonth()] + ' ' + yyyy;
+document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
+
+// Modal sucursal
+function setSucursal() {
+  var sel = document.getElementById('select-sucursal').value;
+  if (!sel) { alert('Selecciona una sucursal'); return; }
+  sucursalActual = sel;
+  document.getElementById('sucursal-label').textContent = sel;
+  document.getElementById('modal-sucursal').classList.remove('open');
+}
+
+// Navegación
+function goTo(n) {
+  document.getElementById('panel'+currentStep).classList.remove('active');
+  var prevTab = document.getElementById('step'+currentStep);
+  prevTab.classList.remove('active');
+  if (n > currentStep) prevTab.classList.add('done');
+  currentStep = n;
+  document.getElementById('panel'+n).classList.add('active');
+  for (var i=0;i<5;i++) {
+    var t = document.getElementById('step'+i);
+    t.classList.remove('active');
+    if (i < n) t.classList.add('done'); else if (i > n) t.classList.remove('done');
+  }
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('prog-fill').style.width = (n/4*100) + '%';
+  window.scrollTo(0,0);
+}
+function next() { if(currentStep<4) goTo(currentStep+1); }
+function prev() { if(currentStep>0) goTo(currentStep-1); }
+
+// Checks
+document.querySelectorAll('.check-item').forEach(function(item){
+  item.addEventListener('change', function(){
+    item.classList.toggle('checked', item.querySelector('input').checked);
+  });
+});
+
+// Dolor
+function toggleDolor(btn, label) {
+  btn.classList.toggle('on');
+  var idx = dolorSelected.indexOf(label);
+  if (idx > -1) dolorSelected.splice(idx,1); else dolorSelected.push(label);
+}
+
+// Firmas
+var drawing = {};
+function initCanvas(id) {
+  var canvas = document.getElementById(id);
+  var wrap   = canvas.parentElement;
+  canvas.width = wrap.offsetWidth || 800;
+  drawing[id]  = false;
+  var hintEl   = document.getElementById('hint-' + id.replace('canvas-',''));
+  function getPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var sx = canvas.width / r.width, sy = canvas.height / r.height;
+    if (e.touches) return {x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy};
+    return {x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy};
+  }
+  function start(e) { e.preventDefault(); drawing[id]=true; if(hintEl) hintEl.style.opacity='0'; var ctx=canvas.getContext('2d'); var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
+  function move(e)  { e.preventDefault(); if(!drawing[id]) return; var ctx=canvas.getContext('2d'); var p=getPos(e); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#1B3A4B'; ctx.lineTo(p.x,p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
+  function end()    { drawing[id]=false; }
+  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move); canvas.addEventListener('mouseup',end); canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false}); canvas.addEventListener('touchend',end);
+}
+function clearCanvas(id, hintId) {
+  var c = document.getElementById(id);
+  c.getContext('2d').clearRect(0,0,c.width,c.height);
+  var h = document.getElementById(hintId); if(h) h.style.opacity='1';
+}
+setTimeout(function(){ ['canvas-cons','canvas-inst','canvas-priv'].forEach(initCanvas); }, 300);
+
+// Helpers
+function getChecked(cid) {
+  var a=[]; document.querySelectorAll('#'+cid+' input:checked').forEach(function(cb){a.push(cb.value);}); return a;
+}
+function v(id){ return document.getElementById(id).value || '—'; }
+
+// ── GENERAR PDF ──────────────────────────────────────────────
+function generarPDF() {
+  var {jsPDF} = window.jspdf;
+  var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var W=210, M=20, Y=M, LH=7;
+
+  function header(title) {
+    doc.setFillColor(27,58,75); doc.rect(0,0,W,22,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+    doc.text('SIDHEGRAF S.A. de C.V.',M,13);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text(title || 'Expediente Digital de Ortesis Plantar',M,19);
+    doc.text('Sucursal: '+sucursalActual,W-M,13,{align:'right'});
+    doc.text('Fecha: '+v('fecha'),W-M,19,{align:'right'});
+    Y=30;
+  }
+  function section(t){ doc.setFillColor(201,123,69); doc.rect(M,Y,W-2*M,6,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t,M+3,Y+4.2); doc.setTextColor(0,0,0); Y+=9; }
+  function row(k,val){ doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90,90,90); doc.text(k+':',M,Y); doc.setTextColor(0,0,0); doc.setFont('helvetica','bold'); doc.text(String(val||'—'),M+58,Y); Y+=LH; }
+  function addSig(cid,nid,label){
+    if(Y>240){doc.addPage();header();}
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(90,90,90); doc.text(label,M,Y); Y+=5;
+    var nv=document.getElementById(nid).value;
+    if(nv){ doc.setFont('helvetica','italic'); doc.setFontSize(11); doc.setTextColor(27,58,75); doc.text(nv,M,Y); Y+=7; }
+    try{ doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG',M,Y,100,25); Y+=28; }catch(e){ Y+=4; }
+    doc.setDrawColor(200,200,200); doc.line(M,Y,W-M,Y); Y+=8;
+  }
+  function footer(){
+    var total=doc.internal.getNumberOfPages();
+    for(var i=1;i<=total;i++){
+      doc.setPage(i); doc.setFillColor(247,245,242); doc.rect(0,282,210,15,'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(150,150,150);
+      doc.text('SIDHEGRAF S.A. de C.V. — '+sucursalActual+' — '+dd+'/'+mm+'/'+yyyy,M,289);
+      doc.text('Pág. '+i+' de '+total,W-M,289,{align:'right'});
+    }
+  }
+
+  var motivos=getChecked('motivos'); var otro=v('otro-motivo'); if(otro!=='—') motivos.push(otro);
+  var valoracion=getChecked('valoracion');
+
+  // Página 1
+  header('Expediente Digital de Ortesis Plantar');
+  section('DATOS DEL CLIENTE');
+  row('Nombre',v('nombre')); row('Edad',v('edad')+' años'); row('Teléfono',v('tel'));
+  row('Ocupación',v('ocup')); row('Actividad física',v('actfis')); row('Estatura',v('estatura')); row('Peso',v('peso')); row('¿Cómo se enteró?',v('enterado'));
+  Y+=3; section('MOTIVO DE VISITA'); row('Motivos',motivos.join(', ')||'No especificado');
+  Y+=3; section('ZONAS DE DOLOR'); row('Dolor en',dolorSelected.join(', ')||'Sin dolor reportado');
+  Y+=3; section('VALORACIÓN CLÍNICA'); row('Hallazgos',valoracion.join(', ')||'Sin hallazgos');
+  Y+=3; section('DATOS DE PLANTILLA'); row('Tipo de calzado',v('tipo-calzado')); row('Número',v('num-plantilla')); row('Horma',v('horma')); row('Talla',v('talla')); row('Entrega',v('entrega'));
+  row('Especialista',v('especialista')); row('Sucursal',sucursalActual);
+
+  // Página 2: Consentimiento
+  doc.addPage(); header('Consentimiento Informado — Ortesis Plantar');
+  section('CONSENTIMIENTO INFORMADO');
+  var textLines=[
+    'Yo, en forma voluntaria y en pleno uso de mis funciones, consiento que SIDHEGRAF S.A. de C.V.',
+    'me realice la toma de estudios y prescriba una ortesis plantar a medida.',
+    '','Primero: Si no informo adecuadamente al especialista, puede haber error en el diagnóstico.',
+    '','Segundo: La podología no es ciencia exacta. Los resultados pueden no ser los esperados.',
+    '','Tercero: Pueden requerirse pruebas complementarias (radiografías, TAC, etc.).',
+    '','Cuarto: No se devolverá el importe. El calzado debe adaptarse a la plantilla.',
+    '','Quinto: Garantía de 60 días con uso correcto y adaptación de 4 semanas.',
+    '','Sexto: Garantía válida desde 5 días post-entrega; máximo 3 veces (lun-vie 11am–7pm).',
+    '','Séptimo: Recoger con ticket o ID. Sin recoger en 1 mes → van a oficinas centrales.'
+  ];
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
+  textLines.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=5.5; } });
+  Y+=4; row('Talla',v('talla')); row('Calzado',v('calzado-cons')||v('tipo-calzado')); row('Entrega',v('entrega')); Y+=4;
+  addSig('canvas-cons','sig-nombre-cons','FIRMA — Consentimiento informado');
+
+  // Página 3: Instrucciones
+  doc.addPage(); header('Instrucciones de Uso y Cuidado');
+  section('INSTRUCCIONES DE USO Y CUIDADO');
+  var inst=[
+    '• Usar de forma paulatina: empezar 2-3 horas e incrementar gradualmente hasta todo el día.',
+    '• Es normal sentir incomodidad al principio; las molestias disminuyen con la adaptación.',
+    '• Periodo de adaptación: 3-4 semanas (hasta 6 semanas en personas muy sensibles).',
+    '• Colocar acomodando primero la punta; asegurarse de que no se muevan ni arruguen.',
+    '• Limpiar con esponja y jabón. No exponer a flamas, disolventes o productos agresivos.',
+    '• Evitar usar con pies descalzos.',
+    '• No usar en suelas desgastadas. Retirar la plantilla de fábrica del calzado.',
+    '• Tacones máx: 2.5 cm hombres, 4 cm mujeres. Evitar horma excesivamente estrecha.',
+    '','PRECAUCIONES:',
+    '• No abusar al inicio (riesgo de irritación y ampollas).',
+    '• Si cambia de zapatos, las plantillas pueden no ajustar.',
+    '• Adaptación progresiva; evitar deportes fuertes sin completar la adaptación.'
+  ];
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
+  inst.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=6; } });
+  Y+=8; addSig('canvas-inst','sig-nombre-inst','FIRMA — Instrucciones de uso y cuidado');
+
+  // Página 4: Privacidad
+  doc.addPage(); header('Aviso de Privacidad');
+  section('AVISO DE PRIVACIDAD');
+  var priv=[
+    'Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V. (el "Responsable"),',
+    'domicilio: calle Mario Pani 200, Col. Santa Fe Cuajimalpa, C.P. 05348, CDMX,',
+    'utilizarán sus datos de identificación y sensibles (estado de salud) para:',
+    '','• Verificar identidad e información.','• Integrar su expediente clínico.',
+    '• Actualizar su información en la base de datos.',
+    '• Prestar los servicios y llevar a cabo la venta de productos solicitados.',
+    '','Aviso completo: www.liverpool.com.mx → Avisos de Privacidad.'
+  ];
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
+  priv.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=5.5; } });
+  Y+=10; addSig('canvas-priv','sig-nombre-priv','NOMBRE Y FIRMA — Aviso de privacidad');
+
+  footer();
+  return doc;
+}
+
+// ── SUBIR A DRIVE ────────────────────────────────────────────
+async function subirDrive() {
+  var statusEl = document.getElementById('drive-status');
+  var btnEl    = document.getElementById('btn-drive');
+
+  if (APPS_SCRIPT_URL.includes('REEMPLAZA')) {
+    statusEl.className = 'drive-status error';
+    statusEl.textContent = '⚠ Configura la URL de Apps Script en el archivo HTML (línea ~10)';
+    return;
+  }
+
+  statusEl.className = 'drive-status uploading';
+  statusEl.textContent = '⏳ Generando PDF y subiendo a Drive...';
+  btnEl.classList.add('loading');
+  btnEl.textContent = 'Subiendo...';
+
+  try {
+    var doc    = generarPDF();
+    var pdfB64 = doc.output('datauristring').split(',')[1];
+    var nombre = v('nombre');
+    var fecha  = v('fecha');
+
+    var res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        pdf:      pdfB64,
+        nombre:   nombre,
+        sucursal: sucursalActual || 'Sin_sucursal',
+        fecha:    fecha
+      })
+    });
+
+    var data = await res.json();
+    if (data.ok) {
+      statusEl.className = 'drive-status done';
+      statusEl.innerHTML = '✓ Guardado en Drive: <strong>' + sucursalActual + '</strong> → ' + (v('nombre'));
+      btnEl.classList.remove('loading');
+      btnEl.classList.add('success');
+      btnEl.textContent = '✓ Guardado correctamente';
+    } else {
+      throw new Error(data.error || 'Error desconocido');
+    }
+  } catch(err) {
+    statusEl.className = 'drive-status error';
+    statusEl.textContent = '✗ Error al subir: ' + err.message;
+    btnEl.classList.remove('loading');
+    btnEl.textContent = 'Reintentar';
+  }
+}
+
+// ── RESUMEN ──────────────────────────────────────────────────
+function buildSummary() {
+  var motivos = getChecked('motivos');
+  var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
+  var val = getChecked('valoracion');
+
+  var h = '<div class="sum-card"><h4>Datos del cliente</h4>';
+  h += '<div class="sum-row"><span class="sum-key">Nombre</span><span class="sum-val">'+v('nombre')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Edad</span><span class="sum-val">'+v('edad')+' años</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Teléfono</span><span class="sum-val">'+v('tel')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Especialista</span><span class="sum-val">'+v('especialista')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
+  h += '</div>';
+  h += '<div class="sum-card"><h4>Evaluación clínica</h4>';
+  h += '<div class="sum-row"><span class="sum-key">Motivo</span><span class="sum-val">'+(motivos.length?motivos.join(', '):'No especificado')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+(dolorSelected.length?dolorSelected.join(', '):'Sin dolor')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Valoración</span><span class="sum-val">'+(val.length?val.join(', '):'Sin hallazgos')+'</span></div>';
+  h += '</div>';
+  h += '<div class="sum-card"><h4>Datos de plantilla</h4>';
+  h += '<div class="sum-row"><span class="sum-key">Talla</span><span class="sum-val">'+v('talla')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Calzado</span><span class="sum-val">'+(v('calzado-cons')!=='—'?v('calzado-cons'):v('tipo-calzado'))+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Número</span><span class="sum-val">'+v('num-plantilla')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
+  h += '</div>';
+  h += '<div class="sum-card" style="background:var(--green-bg);border-color:var(--green-border)"><h4 style="color:var(--green)">Documentos firmados</h4>';
+  h += '<div class="sum-row"><span class="sum-key">Consentimiento informado</span><span class="signed-pill">✓ Firmado</span></div>';
+  h += '<div class="sum-row" style="margin-top:6px"><span class="sum-key">Instrucciones de uso</span><span class="signed-pill">✓ Firmado</span></div>';
+  h += '<div class="sum-row" style="margin-top:6px"><span class="sum-key">Aviso de privacidad</span><span class="signed-pill">✓ Firmado</span></div>';
+  h += '</div>';
+  document.getElementById('summary-content').innerHTML = h;
+  document.getElementById('summary-subtitle').textContent =
+    'Expediente de ' + v('nombre') + ' — ' + sucursalActual;
+}
+
+// ── WHATSAPP ─────────────────────────────────────────────────
+function sendWhatsApp() {
+  var nombre   = v('nombre');
+  var rawTel   = document.getElementById('tel').value.replace(/\D/g,'');
+  var entrega  = v('entrega');
+  var talla    = v('talla');
+  var calzado  = v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado');
+
+  var msg  = '¡Hola ' + nombre + '! 👋\n\n';
+  msg += 'Gracias por tu visita a *Sidhe* — ' + sucursalActual + '.\n';
+  msg += 'Aquí el resumen de tu expediente firmado digitalmente:\n\n';
+  msg += '📋 *Documentos completados:*\n';
+  msg += '✅ Consentimiento informado\n';
+  msg += '✅ Instrucciones de uso y cuidado\n';
+  msg += '✅ Aviso de privacidad\n\n';
+  msg += '👟 *Datos de tus plantillas:*\n';
+  msg += '• Talla: ' + talla + '\n';
+  msg += '• Calzado: ' + calzado + '\n';
+  msg += '• Entrega estimada: ' + entrega + '\n\n';
+  msg += '📌 *Recuerda:*\n';
+  msg += '• Comienza usando 2-3 horas al día e incrementa gradualmente.\n';
+  msg += '• Periodo de adaptación: 3-4 semanas.\n';
+  msg += '• Garantía de 60 días (inicia 5 días después de la entrega).\n';
+  msg += '• Presenta tu ticket o identificación al recoger.\n\n';
+  msg += 'Cualquier duda con gusto te atendemos. 💚\n— Equipo *Sidhe*';
+
+  var url;
+  if (rawTel.length >= 10) {
+    if (!rawTel.startsWith('52')) rawTel = '52' + rawTel;
+    url = 'https://wa.me/' + rawTel + '?text=' + encodeURIComponent(msg);
+  } else {
+    url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  }
+  window.open(url, '_blank');
+}
+
+// ── RESET ─────────────────────────────────────────────────────
+function resetAll() {
+  document.querySelectorAll('input[type=text],input[type=number],input[type=date]').forEach(function(i){ i.value=''; });
+  document.querySelectorAll('input[type=checkbox]').forEach(function(cb){ cb.checked=false; });
+  document.querySelectorAll('.check-item').forEach(function(i){ i.classList.remove('checked'); });
+  document.querySelectorAll('.side-btn').forEach(function(b){ b.classList.remove('on'); });
+  dolorSelected = [];
+  ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
+    var c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height);
+    var h=document.getElementById('hint-'+id.replace('canvas-','')); if(h) h.style.opacity='1';
+  });
+  document.getElementById('fecha').value = yyyy+'-'+mm+'-'+dd;
+  document.getElementById('summary-content').innerHTML = '';
+  var ds=document.getElementById('drive-status'); ds.className='drive-status pending'; ds.textContent='Listo para guardar en Google Drive';
+  var bd=document.getElementById('btn-drive'); bd.classList.remove('loading','success'); bd.textContent='Guardar expediente en Google Drive';
+  goTo(0);
+  document.getElementById('modal-sucursal').classList.add('open');
+}
+</script>
+</body>
+</html>
