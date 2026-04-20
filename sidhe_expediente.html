@@ -1008,27 +1008,26 @@ function sendWhatsApp() {
   var talla   = v('talla');
   var calzado = v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado');
 
-  var msg  = '¡Hola ' + nombre + '! 👋\n\n';
+  var msg  = 'Hola ' + nombre + ',\n\n';
   msg += 'Gracias por tu visita a *Sidhe* — ' + sucursalActual + '.\n';
-  msg += 'Aquí el resumen de tu expediente firmado digitalmente:\n\n';
-  msg += '📋 *Documentos completados:*\n';
-  msg += '✅ Consentimiento informado\n';
-  msg += '✅ Instrucciones de uso y cuidado\n';
-  msg += '✅ Aviso de privacidad\n\n';
-  msg += '👟 *Datos de tus plantillas:*\n';
-  msg += '• Talla: ' + talla + '\n';
-  msg += '• Calzado: ' + calzado + '\n';
-  msg += '• Entrega estimada: ' + entrega + '\n\n';
-  msg += '📌 *Recuerda:*\n';
-  msg += '• Comienza usando 2-3 horas al día e incrementa gradualmente.\n';
-  msg += '• Periodo de adaptación: 3-4 semanas.\n';
-  msg += '• Garantía de 60 días (inicia 5 días después de la entrega).\n';
-  msg += '• Presenta tu ticket o identificación al recoger.\n\n';
-  // Adjuntar link del PDF si ya se subió a Drive
+  msg += 'Aqui el resumen de tu expediente firmado digitalmente:\n\n';
+  msg += '*DOCUMENTOS COMPLETADOS:*\n';
+  msg += '- Consentimiento informado\n';
+  msg += '- Instrucciones de uso y cuidado\n';
+  msg += '- Aviso de privacidad\n\n';
+  msg += '*DATOS DE TUS PLANTILLAS:*\n';
+  msg += '- Talla: ' + talla + '\n';
+  msg += '- Calzado: ' + calzado + '\n';
+  msg += '- Entrega estimada: ' + entrega + '\n\n';
+  msg += '*RECUERDA:*\n';
+  msg += '- Comienza usando 2-3 horas al dia e incrementa gradualmente.\n';
+  msg += '- Periodo de adaptacion: 3-4 semanas.\n';
+  msg += '- Garantia de 60 dias (inicia 5 dias despues de la entrega).\n';
+  msg += '- Presenta tu ticket o identificacion al recoger.\n\n';
   if (pdfDriveUrl) {
-    msg += '📄 *Tu expediente digital:*\n' + pdfDriveUrl + '\n\n';
+    msg += '*TU EXPEDIENTE DIGITAL:*\n' + pdfDriveUrl + '\n\n';
   }
-  msg += 'Cualquier duda con gusto te atendemos. 💚\n— Equipo *Sidhe*';
+  msg += 'Cualquier duda con gusto te atendemos.\n-- Equipo Sidhe';
 
   var url;
   if (rawTel.length >= 10) {
