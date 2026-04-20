@@ -72,6 +72,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px}
 .field input,.field select{font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);transition:border 0.2s,background 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none}
 .field input:focus,.field select:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(27,58,75,0.09)}
+.field input.error,.field select.error{border-color:var(--red);background:var(--red-bg);box-shadow:0 0 0 3px rgba(164,38,44,0.09)}
+.field .err-msg{font-size:11px;color:var(--red);font-weight:500;display:none;margin-top:2px}
+.field input.error~.err-msg,.field select.error~.err-msg{display:block}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:white;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
 
 /* ── SECTION DIVIDER ─────────────────────────────────────────── */
 .sdiv{display:flex;align-items:center;gap:12px;margin:1.5rem 0 1rem}
@@ -173,37 +178,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="field">
       <label>Sucursal</label>
       <select id="select-sucursal">
-        <option value="">— Seleccionar —</option>
-        <option>Liverpool Santa Fe</option>
+        <option value="">— Seleccionar sucursal —</option>
+        <option>Liverpool Polanco</option>
         <option>Liverpool Perisur</option>
         <option>Liverpool Insurgentes</option>
-        <option>Liverpool Satélite</option>
-        <option>Liverpool Polanco</option>
-        <option>Liverpool Interlomas</option>
-        <option>Liverpool Coapa</option>
+        <option>Liverpool Delta</option>
+        <option>Liverpool Santa Fe</option>
         <option>Liverpool Lindavista</option>
-        <option>Liverpool Perinorte</option>
-        <option>Liverpool Tlalnepantla</option>
-        <option>Liverpool Ecatepec</option>
-        <option>Liverpool Texcoco</option>
-        <option>Liverpool Cuicuilco</option>
-        <option>Liverpool Toreo</option>
+        <option>Liverpool Coapa</option>
+        <option>Liverpool Mitikah</option>
+        <option>Liverpool Satélite</option>
         <option>Liverpool Atizapán</option>
-        <option>Liverpool Coacalco</option>
-        <option>Liverpool Ixtapaluca</option>
-        <option>Liverpool Metepec</option>
-        <option>Liverpool Toluca</option>
-        <option>Liverpool Querétaro</option>
-        <option>Liverpool Puebla</option>
-        <option>Liverpool Angelópolis</option>
-        <option>Liverpool Guadalajara</option>
-        <option>Liverpool Galerías GDL</option>
-        <option>Liverpool Andares</option>
-        <option>Liverpool Monterrey</option>
-        <option>Liverpool Valle Oriente</option>
-        <option>Liverpool Tijuana</option>
-        <option>Liverpool Cancún</option>
-        <option>Liverpool Mérida</option>
+        <option>Liverpool Galerías Metepec</option>
+        <option>Liverpool Galerías Pachuca</option>
+        <option>Liverpool Angelópolis Puebla</option>
+        <option>Liverpool Andares Guadalajara</option>
+        <option>Liverpool La Perla Guadalajara</option>
+        <option>Liverpool Galerías Monterrey</option>
+        <option>Liverpool Península Tijuana</option>
+        <option>Liverpool Plaza Mayor León</option>
+        <option>Liverpool Galerías Mérida</option>
+        <option>Liverpool Las Américas Veracruz</option>
+        <option>Liverpool Las Américas Xalapa</option>
+        <option>Liverpool Galerías Cuernavaca</option>
+        <option>Liverpool Crystal Tuxtla</option>
+        <option>Liverpool Plaza Oaxaca</option>
+        <option>Liverpool Antea Querétaro</option>
+        <option>Liverpool Las Américas Morelia</option>
+        <option>Liverpool Altabrisa Villahermosa</option>
+        <option>Liverpool Altaria Aguascalientes</option>
+        <option>Liverpool San Luis Potosí</option>
       </select>
     </div>
     <button class="btn btn-primary" style="width:100%" onclick="setSucursal()">Entrar</button>
@@ -211,6 +215,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <div class="app">
+<div class="toast" id="toast"></div>
 
 <!-- HEADER -->
 <div class="header">
@@ -258,17 +263,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="card-badge">Sección 1 de 4</div>
   </div>
   <div class="form-grid cols2">
-    <div class="field"><label>Especialista</label><input id="especialista" placeholder="Nombre del especialista"/></div>
-    <div class="field"><label>Fecha de consulta</label><input id="fecha" type="date"/></div>
+    <div class="field"><label>Especialista <span style="color:var(--red)">*</span></label><input id="especialista" placeholder="Nombre del especialista"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Fecha de consulta <span style="color:var(--red)">*</span></label><input id="fecha" type="date"/><span class="err-msg">Campo obligatorio</span></div>
   </div>
   <div class="sdiv"><span>Información personal</span></div>
   <div class="form-grid cols2">
-    <div class="field"><label>Nombre completo</label><input id="nombre" placeholder="Nombre del cliente"/></div>
-    <div class="field"><label>Edad</label><input id="edad" type="number" placeholder="Años" min="1" max="120"/></div>
+    <div class="field"><label>Nombre completo <span style="color:var(--red)">*</span></label><input id="nombre" placeholder="Nombre del cliente"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Edad <span style="color:var(--red)">*</span></label><input id="edad" type="number" placeholder="Años" min="1" max="120"/><span class="err-msg">Campo obligatorio</span></div>
   </div>
   <div class="form-grid cols2">
-    <div class="field"><label>Teléfono WhatsApp</label><input id="tel" placeholder="55 1234 5678" inputmode="numeric"/></div>
-    <div class="field"><label>Ocupación</label><input id="ocup" placeholder="Ocupación"/></div>
+    <div class="field"><label>Teléfono WhatsApp <span style="color:var(--red)">*</span></label><input id="tel" placeholder="55 1234 5678" inputmode="numeric"/><span class="err-msg">Campo obligatorio (mínimo 10 dígitos)</span></div>
+    <div class="field"><label>Ocupación <span style="color:var(--red)">*</span></label><input id="ocup" placeholder="Ocupación"/><span class="err-msg">Campo obligatorio</span></div>
+  </div>
+  <div class="form-grid cols1">
+    <div class="field"><label>Correo electrónico <span style="color:var(--red)">*</span></label><input id="email" type="email" placeholder="ejemplo@correo.com" inputmode="email"/><span class="err-msg">Ingresa un correo válido</span></div>
   </div>
   <div class="form-grid cols3">
     <div class="field"><label>Actividad física</label><input id="actfis" placeholder="p. ej. caminar"/></div>
@@ -309,9 +317,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="sdiv"><span>Datos de plantilla</span></div>
   <div class="form-grid cols3">
-    <div class="field"><label>Tipo de calzado</label><input id="tipo-calzado" placeholder="p. ej. tenis"/></div>
-    <div class="field"><label>Número de plantilla</label><input id="num-plantilla" placeholder="p. ej. 26"/></div>
-    <div class="field"><label>Horma</label><input id="horma" placeholder="p. ej. estándar"/></div>
+    <div class="field"><label>Tipo de calzado <span style="color:var(--red)">*</span></label><input id="tipo-calzado" placeholder="p. ej. tenis"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Número de plantilla <span style="color:var(--red)">*</span></label><input id="num-plantilla" placeholder="p. ej. 26"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Horma <span style="color:var(--red)">*</span></label><input id="horma" placeholder="p. ej. estándar"/><span class="err-msg">Campo obligatorio</span></div>
   </div>
   <div class="nav-row"><div></div><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
 </div>
@@ -337,9 +345,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <p><strong>Séptimo.</strong> Para recoger las plantillas debo presentar ticket o identificación oficial. Si en un mes no se recogen, se llevarán a Calz. Gral. Mariano Escobedo 438, Polanco, Anzures, piso 5 (lun–vie 9am–6pm).</p>
   </div></div>
   <div class="form-grid cols3">
-    <div class="field"><label>Talla</label><input id="talla" placeholder="p. ej. 26"/></div>
-    <div class="field"><label>Tipo de calzado</label><input id="calzado-cons" placeholder="p. ej. tenis"/></div>
-    <div class="field"><label>Día de entrega estimado</label><input id="entrega" type="date"/></div>
+    <div class="field"><label>Talla <span style="color:var(--red)">*</span></label><input id="talla" placeholder="p. ej. 26"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Tipo de calzado <span style="color:var(--red)">*</span></label><input id="calzado-cons" placeholder="p. ej. tenis"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Día de entrega estimado <span style="color:var(--red)">*</span></label><input id="entrega" type="date"/><span class="err-msg">Campo obligatorio</span></div>
   </div>
   <div class="sig-section">
     <div class="sig-label">Firma del cliente — Consentimiento informado</div>
@@ -404,7 +412,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="canvas-wrap"><canvas id="canvas-priv" height="150"></canvas><div class="canvas-hint" id="hint-priv">Firmar aquí con el dedo o mouse</div></div>
     <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-priv','hint-priv')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
   </div>
-  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="goTo(4);buildSummary()">Ver resumen →</button></div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="if(panelValidations[3]()){goTo(4);buildSummary();}">Ver resumen →</button></div>
 </div>
 </div>
 
@@ -450,8 +458,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 // ── CONFIGURACIÓN ────────────────────────────────────────────
-// 👇 Reemplaza esta URL con la que te da Google Apps Script al desplegar
-var APPS_SCRIPT_URL = "https://script.google.com/macros/s/REEMPLAZA_CON_TU_URL/exec";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9ShpTCMVEk1fp9F53Q3-tTRRgrSsVu9IPZ6H9UUY81krZu8pKfdu-1snA1neiVQRv/exec";
 // ────────────────────────────────────────────────────────────
 
 var currentStep = 0;
@@ -470,11 +477,115 @@ document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
 // Modal sucursal
 function setSucursal() {
   var sel = document.getElementById('select-sucursal').value;
-  if (!sel) { alert('Selecciona una sucursal'); return; }
+  if (!sel) { showToast('⚠ Selecciona una sucursal'); return; }
   sucursalActual = sel;
   document.getElementById('sucursal-label').textContent = sel;
   document.getElementById('modal-sucursal').classList.remove('open');
 }
+
+// Toast
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// Validaciones por panel
+var panelValidations = {
+  0: function() {
+    var rules = [
+      { id:'especialista', check: function(v){ return v.trim().length > 0; } },
+      { id:'fecha',        check: function(v){ return v.trim().length > 0; } },
+      { id:'nombre',       check: function(v){ return v.trim().length > 0; } },
+      { id:'edad',         check: function(v){ return v.trim().length > 0 && parseInt(v) > 0; } },
+      { id:'tel',          check: function(v){ return v.replace(/\D/g,'').length >= 10; } },
+      { id:'ocup',         check: function(v){ return v.trim().length > 0; } },
+      { id:'email',        check: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); } },
+      { id:'tipo-calzado', check: function(v){ return v.trim().length > 0; } },
+      { id:'num-plantilla',check: function(v){ return v.trim().length > 0; } },
+      { id:'horma',        check: function(v){ return v.trim().length > 0; } },
+    ];
+    // motivo: al menos uno marcado o campo "otro" llenado
+    var motivosChecked = document.querySelectorAll('#motivos input:checked').length > 0;
+    var otroMotivo = document.getElementById('otro-motivo').value.trim().length > 0;
+    var motivoOk = motivosChecked || otroMotivo;
+    return validateRules(rules) && checkMotivo(motivoOk);
+  },
+  1: function() {
+    var rules = [
+      { id:'talla',       check: function(v){ return v.trim().length > 0; } },
+      { id:'calzado-cons',check: function(v){ return v.trim().length > 0; } },
+      { id:'entrega',     check: function(v){ return v.trim().length > 0; } },
+    ];
+    var nameOk = document.getElementById('sig-nombre-cons').value.trim().length > 0;
+    var canvasOk = canvasHasContent('canvas-cons');
+    var fieldsOk = validateRules(rules);
+    if (!nameOk) { showToast('✍ Escribe el nombre en la firma del consentimiento'); }
+    else if (!canvasOk) { showToast('✍ El cliente debe firmar el consentimiento'); }
+    return fieldsOk && nameOk && canvasOk;
+  },
+  2: function() {
+    var nameOk = document.getElementById('sig-nombre-inst').value.trim().length > 0;
+    var canvasOk = canvasHasContent('canvas-inst');
+    if (!nameOk) { showToast('✍ Escribe el nombre en la firma de instrucciones'); }
+    else if (!canvasOk) { showToast('✍ El cliente debe firmar las instrucciones'); }
+    return nameOk && canvasOk;
+  },
+  3: function() {
+    var acepto = document.getElementById('acepto-priv').checked;
+    var nameOk = document.getElementById('sig-nombre-priv').value.trim().length > 0;
+    var canvasOk = canvasHasContent('canvas-priv');
+    if (!acepto) { showToast('☑ El cliente debe aceptar el aviso de privacidad'); return false; }
+    if (!nameOk) { showToast('✍ Escribe el nombre en la firma de privacidad'); return false; }
+    if (!canvasOk) { showToast('✍ El cliente debe firmar el aviso de privacidad'); return false; }
+    return true;
+  }
+};
+
+function validateRules(rules) {
+  var allOk = true;
+  rules.forEach(function(r) {
+    var el = document.getElementById(r.id);
+    if (!el) return;
+    var ok = r.check(el.value);
+    if (!ok) {
+      el.classList.add('error');
+      allOk = false;
+    } else {
+      el.classList.remove('error');
+    }
+  });
+  if (!allOk) showToast('⚠ Completa todos los campos obligatorios (marcados con *)');
+  return allOk;
+}
+
+function checkMotivo(ok) {
+  var container = document.getElementById('motivos');
+  if (!ok) {
+    showToast('⚠ Selecciona al menos un motivo de visita');
+    container.style.outline = '2px solid var(--red)';
+    container.style.borderRadius = '10px';
+    return false;
+  }
+  container.style.outline = '';
+  return true;
+}
+
+function canvasHasContent(id) {
+  var canvas = document.getElementById(id);
+  var ctx = canvas.getContext('2d');
+  var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  for (var i = 3; i < data.length; i += 4) { if (data[i] > 0) return true; }
+  return false;
+}
+
+// Limpiar error al escribir
+document.querySelectorAll('.field input, .field select').forEach(function(el) {
+  el.addEventListener('input', function(){ el.classList.remove('error'); });
+  el.addEventListener('change', function(){ el.classList.remove('error'); });
+});
 
 // Navegación
 function goTo(n) {
@@ -493,7 +604,14 @@ function goTo(n) {
   document.getElementById('prog-fill').style.width = (n/4*100) + '%';
   window.scrollTo(0,0);
 }
-function next() { if(currentStep<4) goTo(currentStep+1); }
+
+function next() {
+  if (currentStep < 4) {
+    var validator = panelValidations[currentStep];
+    if (validator && !validator()) return;
+    goTo(currentStep + 1);
+  }
+}
 function prev() { if(currentStep>0) goTo(currentStep-1); }
 
 // Checks
@@ -672,17 +790,47 @@ async function subirDrive() {
   try {
     var doc    = generarPDF();
     var pdfB64 = doc.output('datauristring').split(',')[1];
-    var nombre = v('nombre');
-    var fecha  = v('fecha');
+
+    var motivos    = getChecked('motivos');
+    var otroMotivo = v('otro-motivo'); if(otroMotivo !== '—') motivos.push(otroMotivo);
+    var valoracion = getChecked('valoracion');
+
+    var now = new Date();
+    var hora = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+    var payload = {
+      // PDF
+      pdf:           pdfB64,
+      // Identificación
+      sucursal:      sucursalActual || 'Sin sucursal',
+      especialista:  v('especialista'),
+      fecha:         v('fecha'),
+      hora:          hora,
+      // Datos personales
+      nombre:        v('nombre'),
+      edad:          v('edad'),
+      telefono:      v('tel'),
+      email:         v('email'),
+      ocupacion:     v('ocup'),
+      actividad:     v('actfis'),
+      estatura:      v('estatura'),
+      peso:          v('peso'),
+      como_entero:   v('enterado'),
+      // Motivo y clínica
+      motivos:       motivos.join(', '),
+      dolor:         dolorSelected.join(', ') || 'Sin dolor reportado',
+      valoracion:    valoracion.join(', ') || 'Sin hallazgos',
+      // Plantilla
+      talla:         v('talla'),
+      calzado:       v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado'),
+      num_plantilla: v('num-plantilla'),
+      horma:         v('horma'),
+      entrega:       v('entrega'),
+    };
 
     var res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({
-        pdf:      pdfB64,
-        nombre:   nombre,
-        sucursal: sucursalActual || 'Sin_sucursal',
-        fecha:    fecha
-      })
+      body: JSON.stringify(payload)
     });
 
     var data = await res.json();
