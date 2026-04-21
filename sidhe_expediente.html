@@ -470,6 +470,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <p>• No abuse de las plantillas durante la fase inicial de uso. Esto puede causar irritación de la piel y ampollas.</p>
     <p>• Tenga en cuenta que, si cambia de zapatos, es posible que las plantillas no le queden bien, ya que las hormas de cada calzado son diferentes y suelen variar.</p>
     <p>• La adaptación de su uso debe hacerse progresivamente y de preferencia no realizar deportes o caminatas fuertes sin antes haber completado su adaptación.</p>
+    <p style="margin-top:1rem">Yo ______________________________________________ he leído cada uno de los puntos sobre los usos y cuidados de las plantillas y estoy á que para aplicar la garantía tengo que hacer uso correcto de las plantillas, tal como lo indican en párrafos anteriores.</p>
   </div></div>
   <div class="sig-section">
     <div class="sig-label">Firma del cliente — Instrucciones de uso</div>
@@ -876,8 +877,8 @@ function generarPDF() {
   inst.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=6; } });
   Y+=8;
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-  doc.text('Yo _______________________________ he leido cada uno de los puntos sobre los usos y',M,Y); Y+=5.5;
-  doc.text('cuidados de las plantillas y estoy de acuerdo que para aplicar la garantia tengo que hacer',M,Y); Y+=5.5;
+  doc.text('Yo _______________________________ he leido cada uno de los puntos',M,Y); Y+=5.5;
+  doc.text('sobre los usos y cuidados de las plantillas y estoy a que para aplicar la garantia tengo que hacer',M,Y); Y+=5.5;
   doc.text('uso correcto de las plantillas, tal como lo indican en parrafos anteriores.',M,Y); Y+=8;
   addSig('canvas-inst','sig-nombre-inst','FIRMA — Instrucciones de uso y cuidado');
 
