@@ -766,145 +766,390 @@ function v(id){ return document.getElementById(id).value || '—'; }
 function generarPDF() {
   var {jsPDF} = window.jspdf;
   var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210, M=20, Y=M, LH=7;
+  var W=210, ML=18, MR=18, Y=0;
+  var CW = W-ML-MR; // content width = 174mm
 
-  function header(title) {
-    doc.setFillColor(27,58,75); doc.rect(0,0,W,22,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
-    doc.text('SIDHEGRAF S.A. de C.V.',M,13);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.text(title || 'Expediente Digital de Ortesis Plantar',M,19);
-    doc.text('Sucursal: '+sucursalActual,W-M,13,{align:'right'});
-    doc.text('Fecha: '+v('fecha'),W-M,19,{align:'right'});
-    Y=30;
+  // ── COLORES ──────────────────────────────────────────────────
+  var C_DARK   = [27,58,75];
+  var C_GOLD   = [201,123,69];
+  var C_LIGHT  = [247,245,242];
+  var C_MID    = [224,219,212];
+  var C_WHITE  = [255,255,255];
+  var C_TEXT   = [30,30,30];
+  var C_SUB    = [100,100,100];
+  var C_GREEN  = [45,106,79];
+
+  // ── HEADER ───────────────────────────────────────────────────
+  function drawHeader(pageTitle, pageNum) {
+    // Franja oscura
+    doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.rect(0,0,W,28,'F');
+    // Franja dorada fina
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.rect(0,28,W,1.2,'F');
+
+    // Logo placeholder (círculo estilizado)
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.circle(ML+6, 14, 6, 'F');
+    doc.setFillColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+    doc.circle(ML+6, 14, 3.5, 'F');
+    doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.circle(ML+6, 14, 1.5, 'F');
+
+    // Empresa
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+    doc.text('SIDHEGRAF S.A. de C.V.', ML+15, 11);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.text(pageTitle, ML+15, 18);
+    doc.setTextColor(180,180,180);
+    doc.setFontSize(7.5);
+    doc.text('Expediente Digital de Ortesis Plantar', ML+15, 24);
+
+    // Datos derecha
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+    doc.text(sucursalActual, W-MR, 11, {align:'right'});
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(180,180,180);
+    doc.text('Fecha: '+v('fecha'), W-MR, 17, {align:'right'});
+    doc.text('Pag. '+pageNum, W-MR, 23, {align:'right'});
+
+    Y = 36;
   }
-  function section(t){ doc.setFillColor(201,123,69); doc.rect(M,Y,W-2*M,6,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t,M+3,Y+4.2); doc.setTextColor(0,0,0); Y+=9; }
-  function row(k,val){ doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90,90,90); doc.text(k+':',M,Y); doc.setTextColor(0,0,0); doc.setFont('helvetica','bold'); doc.text(String(val||'—'),M+58,Y); Y+=LH; }
-  function addSig(cid,nid,label){
-    if(Y>240){doc.addPage();header();}
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(90,90,90); doc.text(label,M,Y); Y+=5;
-    var nv=document.getElementById(nid).value;
-    if(nv){ doc.setFont('helvetica','italic'); doc.setFontSize(11); doc.setTextColor(27,58,75); doc.text(nv,M,Y); Y+=7; }
-    try{ doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG',M,Y,100,25); Y+=28; }catch(e){ Y+=4; }
-    doc.setDrawColor(200,200,200); doc.line(M,Y,W-M,Y); Y+=8;
+
+  // ── SECTION HEADER ────────────────────────────────────────────
+  function section(title) {
+    if(Y > 265) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
+    Y += 3;
+    doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.rect(ML, Y, CW, 7, 'F');
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.rect(ML, Y, 2.5, 7, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+    doc.text(title, ML+6, Y+4.8);
+    doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    Y += 11;
   }
-  function footer(){
-    var total=doc.internal.getNumberOfPages();
+
+  // ── DATA ROW ─────────────────────────────────────────────────
+  function row(label, value, isAlt) {
+    if(Y > 270) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
+    var bg = isAlt ? C_LIGHT : C_WHITE;
+    doc.setFillColor(bg[0],bg[1],bg[2]);
+    doc.rect(ML, Y-4, CW, 6.5, 'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text(label, ML+3, Y);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    doc.text(String(value||'—'), ML+62, Y);
+    Y += 6.5;
+  }
+
+  // ── TWO-COL ROW ───────────────────────────────────────────────
+  function row2(l1,v1,l2,v2,isAlt) {
+    if(Y > 270) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
+    var bg = isAlt ? C_LIGHT : C_WHITE;
+    doc.setFillColor(bg[0],bg[1],bg[2]);
+    doc.rect(ML, Y-4, CW, 6.5, 'F');
+    var hw = CW/2;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text(l1, ML+3, Y);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    doc.text(String(v1||'—'), ML+38, Y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text(l2, ML+hw+3, Y);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    doc.text(String(v2||'—'), ML+hw+38, Y);
+    Y += 6.5;
+  }
+
+  // ── SEPARATOR ─────────────────────────────────────────────────
+  function sep() {
+    doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
+    doc.setLineWidth(0.3);
+    doc.line(ML,Y,W-MR,Y);
+    Y += 5;
+  }
+
+  // ── BODY TEXT ─────────────────────────────────────────────────
+  function bodyText(lines, size) {
+    size = size || 8.5;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(size);
+    doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    lines.forEach(function(l){
+      if(Y > 270){ doc.addPage(); drawHeader(currentDocTitle, ++currentPage); Y+=4; }
+      if(l===''){Y+=3;return;}
+      doc.text(l, ML, Y);
+      Y += size*0.45 + 2;
+    });
+  }
+
+  // ── SIGNATURE BLOCK ───────────────────────────────────────────
+  function addSig(cid, nid, label) {
+    if(Y > 230){ doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
+    Y += 4;
+    // Box
+    doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
+    doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(ML, Y, CW, 42, 2, 2, 'FD');
+    // Label
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text(label.toUpperCase(), ML+4, Y+6);
+    // Gold underline
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.rect(ML+4, Y+7.5, 40, 0.5, 'F');
+    // Nombre escrito
+    var nv = document.getElementById(nid).value;
+    if(nv){
+      doc.setFont('helvetica','italic'); doc.setFontSize(12);
+      doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+      doc.text(nv, ML+4, Y+17);
+    }
+    // Imagen firma
+    try{
+      doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG', ML+4, Y+18, 80, 20);
+    }catch(e){}
+    // Línea de firma
+    doc.setDrawColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.setLineWidth(0.5);
+    doc.line(ML+4, Y+39, ML+90, Y+39);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text('Firma del cliente', ML+4, Y+43.5);
+    // Fecha y hora
+    doc.text('Fecha: '+v('fecha')+'   Hora: '+(new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})), W-MR, Y+43.5, {align:'right'});
+    Y += 50;
+  }
+
+  // ── FOOTER ────────────────────────────────────────────────────
+  function footer() {
+    var total = doc.internal.getNumberOfPages();
     for(var i=1;i<=total;i++){
-      doc.setPage(i); doc.setFillColor(247,245,242); doc.rect(0,282,210,15,'F');
-      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(150,150,150);
-      doc.text('SIDHEGRAF S.A. de C.V. — '+sucursalActual+' — '+dd+'/'+mm+'/'+yyyy,M,289);
-      doc.text('Pág. '+i+' de '+total,W-M,289,{align:'right'});
+      doc.setPage(i);
+      doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+      doc.rect(0,286,W,11,'F');
+      doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+      doc.rect(0,285.2,W,0.8,'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+      doc.setTextColor(180,180,180);
+      doc.text('SIDHEGRAF S.A. de C.V.  |  '+sucursalActual+'  |  Expediente generado el '+dd+'/'+mm+'/'+yyyy, ML, 291.5);
+      doc.setTextColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+      doc.text('Documento confidencial — uso exclusivo Sidhe', W-MR, 291.5, {align:'right'});
     }
   }
 
-  var motivos=getChecked('motivos'); var otro=v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  var valoracion=getChecked('valoracion');
+  // ── DIVIDER ORNAMENT ─────────────────────────────────────────
+  function ornament() {
+    Y += 2;
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.rect(ML,Y,15,0.8,'F');
+    doc.rect(W-MR-15,Y,15,0.8,'F');
+    doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.circle(W/2, Y+0.4, 1.2, 'F');
+    Y += 6;
+  }
 
-  // Página 1
-  header('Expediente Digital de Ortesis Plantar');
-  section('DATOS DEL CLIENTE');
-  row('Nombre',v('nombre')); row('Edad',v('edad')+' años'); row('Teléfono',v('tel'));
-  row('Ocupación',v('ocup')); row('Actividad física',v('actfis')); row('Estatura',v('estatura')); row('Peso',v('peso')); row('¿Cómo se enteró?',v('enterado'));
-  Y+=3; section('MOTIVO DE VISITA'); row('Motivos',motivos.join(', ')||'No especificado');
-  Y+=3; section('ZONAS DE DOLOR'); row('Dolor en',dolorSelected.join(', ')||'Sin dolor reportado');
-  Y+=3; section('VALORACIÓN CLÍNICA'); row('Hallazgos',valoracion.join(', ')||'Sin hallazgos');
-  Y+=3; section('DATOS DE PLANTILLA'); row('Tipo de calzado',v('tipo-calzado')); row('Número',v('num-plantilla')); row('Horma',v('horma')); row('Talla',v('talla')); row('Entrega',v('entrega'));
-  row('Especialista',v('especialista')); row('Sucursal',sucursalActual);
+  var currentDocTitle = '';
+  var currentPage = 1;
+  var motivos = getChecked('motivos');
+  var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
+  var valoracion = getChecked('valoracion');
 
-  // Página 2: Consentimiento
-  doc.addPage(); header('Consentimiento Informado — Ortesis Plantar');
-  section('CONSENTIMIENTO INFORMADO');
-  var textLines=[
-    'Yo, en forma voluntaria, y en pleno uso de mis funciones mentales y de mis derechos,',
-    'consiento SIDHEGRAF S.A. de C.V., me realice la toma de estudios y me prescriba una',
-    'ortesis plantar (plantillas) a medida y personalizada, para tener una herramienta mas',
-    'que me aporte beneficio aunado al motivo principal por el cual acudi a consulta.',
+  // ════════════════════════════════════════════════════════════
+  // PÁGINA 1 — DATOS DEL CLIENTE
+  // ════════════════════════════════════════════════════════════
+  currentDocTitle = 'Datos del Cliente'; currentPage=1;
+  drawHeader(currentDocTitle, currentPage);
+
+  section('DATOS PERSONALES');
+  row('Nombre completo', v('nombre'), false);
+  row2('Edad', v('edad')+' años', 'Teléfono', v('tel'), true);
+  row2('Correo', v('email'), 'Ocupación', v('ocup'), false);
+  row2('Estatura', v('estatura'), 'Peso', v('peso'), true);
+  row2('Actividad física', v('actfis'), '¿Cómo se enteró?', v('enterado'), false);
+  row('Especialista', v('especialista'), true);
+  row('Sucursal', sucursalActual, false);
+
+  Y += 2; section('MOTIVO DE VISITA');
+  row('Motivos', motivos.join(' | ') || 'No especificado', false);
+
+  Y += 2; section('ZONAS DE DOLOR');
+  row('Dolor reportado', dolorSelected.join(' | ') || 'Sin dolor reportado', false);
+
+  Y += 2; section('VALORACIÓN CLÍNICA');
+  row('Hallazgos', valoracion.join(' | ') || 'Sin hallazgos marcados', false);
+
+  Y += 2; section('DATOS DE PLANTILLA');
+  row2('Talla', v('talla'), 'Número', v('num-plantilla'), false);
+  row2('Tipo de calzado', v('tipo-calzado'), 'Horma', v('horma'), true);
+  row('Fecha de entrega estimada', v('entrega'), false);
+
+  Y += 6; ornament();
+
+  // Recuadro resumen profesional
+  doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
+  doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(ML, Y, CW, 20, 2, 2, 'FD');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+  doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+  doc.text('Documentos incluidos en este expediente:', ML+5, Y+7);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7);
+  doc.setTextColor(C_GREEN[0],C_GREEN[1],C_GREEN[2]);
+  doc.text('✓  Consentimiento informado    ✓  Instrucciones de uso y cuidado    ✓  Aviso de privacidad', ML+5, Y+14);
+  Y += 25;
+
+  // ════════════════════════════════════════════════════════════
+  // PÁGINA 2 — CONSENTIMIENTO
+  // ════════════════════════════════════════════════════════════
+  doc.addPage(); currentDocTitle='Consentimiento Informado'; currentPage=2;
+  drawHeader(currentDocTitle, currentPage);
+  section('CONSENTIMIENTO INFORMADO PARA CONFECCION DE ORTESIS PLANTARES PERSONALIZADAS');
+
+  bodyText([
+    'Yo, en forma voluntaria, y en pleno uso de mis funciones mentales y de mis derechos, consiento',
+    'SIDHEGRAF S.A. de C.V., me realice la toma de estudios y me prescriba una ortesis plantar',
+    '(plantillas) a medida y personalizada, para tener una herramienta mas que me aporte beneficio',
+    'aunado al motivo principal por el cual acudi a consulta, de forma voluntaria.',
     '','Manifiesto que:',
-    '','-Primero.- Entiendo que, si no informo adecuadamente al especialista de mis antecedentes',
-    'y con todos los datos necesarios para un buen diagnostico clinico, se puede ocasionar',
-    'confusion en el diagnostico o error en la seleccion del tratamiento que busca mi bienestar.',
-    '','-Segundo.- Este tratamiento ortesico consiste en una ortesis plantar (plantilla). La practica',
-    'de la podologia no es una ciencia exacta. El especialista busca los mejores resultados para',
-    'modificar o normalizar los aspectos funcionales del sistema musculoesqueletico. El',
-    'tratamiento puede no alcanzar totalmente los resultados esperados ni evita ajustes futuros.',
-    '','-Tercero.- Pueden presentarse complicaciones que requieran pruebas complementarias',
-    '(radiografias, ecografias, TAC, resonancia, etc.) a ser vistas con un medico especialista.',
-    '','-Cuarto.- El tratamiento se realiza personalizado al pie. En ningun momento se devolvera',
-    'el importe pagado. El calzado debe adaptarse a la plantilla y esta al pie.',
-    '','-Quinto.- Para hacer valida la garantia (60 dias), debo hacer uso correcto de las plantillas',
-    'con un periodo de adaptacion de 4 semanas de uso progresivo.',
-    '','-Sexto.- La garantia inicia 5 dias despues de la entrega en sucursal; valida maximo 3',
-    'veces, de lunes a viernes de 11am a 7pm.',
-    '','-Septimo.- Para recoger las plantillas debo mostrar ticket o identificacion oficial. Sin',
-    'recoger en 1 mes se llevaran a: Calz. Gral. Mariano Escobedo 438, Polanco, Anzures, piso 5',
-    '(lun-vie 9am-6pm).',
+    '',
+    '-Primero.- Entiendo que, si no informo adecuadamente al especialista de mis antecedentes y con',
+    'todos los datos necesarios para un buen diagnostico clinico, se puede ocasionar confusion en el',
+    'diagnostico o error en la seleccion del tratamiento que busca mi bienestar.',
+    '',
+    '-Segundo.- Este tratamiento ortesico que se va a pautar consiste en una ortesis plantar (plantilla).',
+    'Se me ha explicado y entiendo que, al igual que en otras especialidades medicas, la practica de la',
+    'podologia no es una ciencia exacta, debiendo el especialista colocar todo su conocimiento y su',
+    'pericia en buscar los mejores resultados con el objetivo de modificar o normalizar los aspectos',
+    'funcionales del sistema musculoesqueletico. Por lo tanto, al saber que las plantillas son una',
+    'herramienta mas, el tratamiento ortesico que voy a llevar, puede no llegar a alcanzar totalmente',
+    'los resultados esperados. Tampoco evita que en un futuro haya que realizar pequenos ajustes.',
+    '',
+    '-Tercero.- Entiendo tambien que, como en todos los tratamientos, se pueden presentar',
+    'complicaciones que podrian requerir tratamientos adicionales ademas de solicitar pruebas',
+    'complementarias como radiografias, ecografias, TAC, resonancia, etc.; esto tendra que ser',
+    'visto con un medico especialista.',
+    '',
+    '-Cuarto.- El tratamiento ortesico se realiza personalizado al pie de cada paciente, haciendose a',
+    'medida, y de acuerdo a la patologia que presenta. En funcion de ello, entiendo que en ningun',
+    'momento se me devolvera el importe pagado por las ortesis realizadas, asi mismo entiendo que el',
+    'calzado debe adaptarse a la plantilla y esta al pie.',
+    '',
+    '-Quinto.- Estoy consciente que para hacer valida mi garantia (60 dias), tengo que hacer el uso',
+    'correcto de las plantillas donde existe un periodo de adaptacion de 4 semanas, en el cual, es de',
+    'uso progresivo y existe la posibilidad que tenga molestias, o incomodidades nuevas.',
+    '',
+    '-Sexto.- Estoy consciente que la garantia de las plantillas empezara 5 dias despues de que las',
+    'plantillas se encuentren en sucursal y solo se hara valida con un maximo de 3 veces en donde se',
+    'adquirio el producto, dentro de un horario de lunes a viernes de 11am a 7pm.',
+    '',
+    '-Septimo.- Para recoger las plantillas en sucursal, debo mostrar ticket de compra o identificacion',
+    'oficial. Si en un lapso de un mes no se recogen, se llevaran a oficinas centrales Sidhe: Calz. Gral.',
+    'Mariano Escobedo 438, Polanco, Anzures, piso 5 (lun-vie 9am-6pm).',
     '','Con todo lo expuesto anteriormente, doy mi conformidad:'
-  ];
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
-  textLines.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=5.5; } });
-  Y+=4; row('Talla',v('talla')); row('Calzado',v('calzado-cons')||v('tipo-calzado')); row('Entrega',v('entrega')); Y+=4;
-  addSig('canvas-cons','sig-nombre-cons','FIRMA — Consentimiento informado');
+  ]);
 
-  // Página 3: Instrucciones
-  doc.addPage(); header('Instrucciones de Uso y Cuidado');
-  section('INSTRUCCIONES DE USO Y CUIDADO');
-  var inst=[
-    '* Usar las plantillas de manera paulatina. Conforme el cuerpo se vaya adaptando,',
-    '  incrementar el tiempo de uso poco a poco (puede empezar por 2 o 3 horas), hasta que,',
-    '  conforme a su avance, se puedan usar todo el dia.',
-    '* Es normal sentir incomodidad o ligeros dolores musculoesqueleticos al principio.',
-    '  Conforme a su adaptacion las molestias deben de ir desapareciendo.',
-    '* El periodo de adaptacion va de 3 a 4 semanas, en personas muy sensibles puede durar',
-    '  hasta 6 semanas.',
-    '* Colocar las plantillas en el calzado acomodando primero la punta. Asegurar que las',
-    '  plantillas no se muevan o se arruguen.',
-    '* Limpiar las plantillas con una esponja y un poco de jabon.',
-    '* No exponer las plantillas a flamas, disolventes o productos agresivos que puedan danarlas.',
-    '* Evitar usar las plantillas con los pies descalzos.',
-    '* Usar las plantillas en calzado donde te haga sentir comodo.',
+  Y += 3;
+  row2('Talla', v('talla'), 'Tipo de calzado', v('calzado-cons')||v('tipo-calzado'), false);
+  row2('Fecha', v('fecha'), 'Dia de entrega', v('entrega'), true);
+  Y += 4;
+  addSig('canvas-cons','sig-nombre-cons','Firma del cliente — Consentimiento Informado');
+
+  // ════════════════════════════════════════════════════════════
+  // PÁGINA 3 — INSTRUCCIONES
+  // ════════════════════════════════════════════════════════════
+  doc.addPage(); currentDocTitle='Instrucciones de Uso y Cuidado'; currentPage=3;
+  drawHeader(currentDocTitle, currentPage);
+  section('INSTRUCCIONES DE USO Y CUIDADO DE TUS PLANTILLAS');
+
+  bodyText([
+    '• Usar las plantillas de manera paulatina. Conforme el cuerpo se vaya adaptando, incrementar el',
+    '  tiempo de uso poco a poco (puede empezar por 2 o 3 horas), hasta que, conforme a su avance,',
+    '  se puedan usar todo el dia.',
+    '',
+    '• Es normal sentir incomodidad o ligeros dolores musculoesqueleticos al principio. Conforme a su',
+    '  adaptacion las molestias deben de ir desapareciendo.',
+    '',
+    '• El periodo de adaptacion va de 3 a 4 semanas, en personas muy sensibles puede durar hasta',
+    '  6 semanas.',
+    '',
+    '• Colocar las plantillas en el calzado acomodando primero la punta. Asegurar que las plantillas',
+    '  no se muevan o se arruguen.',
+    '',
+    '• Limpiar las plantillas con una esponja y un poco de jabon.',
+    '',
+    '• No exponer las plantillas a flamas, disolventes o productos agresivos que puedan danarlas.',
+    '',
+    '• Evitar usar las plantillas con los pies descalzos.',
+    '',
+    '• Usar las plantillas en calzado donde te haga sentir comodo.',
     '  Tips: No usar en suelas desgastadas. Quitar la plantilla de fabrica que viene en el calzado.',
     '  No usar tacones mayores de 2.5 cm en hombres y 4 cm en mujeres.',
-    '  No usar calzado con horma excesivamente estrecha.',
-    '','Precauciones:',
-    '* No abuse de las plantillas durante la fase inicial de uso. Puede causar irritacion y ampollas.',
-    '* Si cambia de zapatos, es posible que las plantillas no le queden bien, ya que las hormas',
-    '  de cada calzado son diferentes y suelen variar.',
-    '* La adaptacion de su uso debe hacerse progresivamente y de preferencia no realizar',
-    '  deportes o caminatas fuertes sin antes haber completado su adaptacion.'
-  ];
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
-  inst.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=6; } });
-  Y+=8;
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-  doc.text('Yo _______________________________ he leido cada uno de los puntos',M,Y); Y+=5.5;
-  doc.text('sobre los usos y cuidados de las plantillas y estoy a que para aplicar la garantia tengo que hacer',M,Y); Y+=5.5;
-  doc.text('uso correcto de las plantillas, tal como lo indican en parrafos anteriores.',M,Y); Y+=8;
-  addSig('canvas-inst','sig-nombre-inst','FIRMA — Instrucciones de uso y cuidado');
+    '  No usar calzado con horma excesivamente estrecha.'
+  ]);
 
-  // Página 4: Privacidad
-  doc.addPage(); header('Aviso de Privacidad');
+  Y += 2; section('PRECAUCIONES');
+  bodyText([
+    '• No abuse de las plantillas durante la fase inicial de uso. Esto puede causar irritacion de la piel',
+    '  y ampollas.',
+    '',
+    '• Tenga en cuenta que, si cambia de zapatos, es posible que las plantillas no le queden bien, ya',
+    '  que las hormas de cada calzado son diferentes y suelen variar.',
+    '',
+    '• La adaptacion de su uso debe hacerse progresivamente y de preferencia no realizar deportes o',
+    '  caminatas fuertes sin antes haber completado su adaptacion.'
+  ]);
+
+  Y += 6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+  doc.text('Yo ____________________________________________ he leido cada uno de los puntos sobre los', ML, Y); Y+=5;
+  doc.text('usos y cuidados de las plantillas y estoy a que para aplicar la garantia tengo que hacer uso', ML, Y); Y+=5;
+  doc.text('correcto de las plantillas, tal como lo indican en parrafos anteriores.', ML, Y); Y+=4;
+  addSig('canvas-inst','sig-nombre-inst','Firma del cliente — Instrucciones de Uso y Cuidado');
+
+  // ════════════════════════════════════════════════════════════
+  // PÁGINA 4 — AVISO DE PRIVACIDAD
+  // ════════════════════════════════════════════════════════════
+  doc.addPage(); currentDocTitle='Aviso de Privacidad'; currentPage=4;
+  drawHeader(currentDocTitle, currentPage);
   section('AVISO DE PRIVACIDAD');
-  var priv=[
-    'Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V. (conjuntamente o cada uno',
-    'de ellos en lo individual como el "Responsable"), con domicilio en calle Mario Pani, numero',
-    '200, Colonia Santa Fe Cuajimalpa, Cuajimalpa de Morelos, Codigo Postal 05348, Ciudad de',
-    'Mexico, utilizaran sus dato personales de identificacion y datos personales sensibles como',
-    'estado de salud, con las siguientes finalidades:',
-    '','* Verificar su identidad e informacion;',
-    '* Integrar su expediente;',
-    '* Actualizar su informacion en nuestra base de datos;',
-    '* Prestar los servicios solicitados y llevar a cabo la venta de productos solicitados por',
-    '  usted (incluyendo sin limitar los servicios de venta fisica, por telefono e internet); y',
-    '* Prestar los servicios solicitados y llevar a cabo la venta de productos solicitados por',
-    '  usted (incluyendo sin limitar los servicios de venta fisica, por telefono e internet).',
-    '','Para mayor informacion sobre el tratamiento de sus datos personales y los derechos que',
-    'tiene, consulte el Aviso de Privacidad Integral Clientes en la pagina www.liverpool.com.mx',
-    'en la seccion Avisos de Privacidad.'
-  ];
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(40,40,40);
-  priv.forEach(function(l){ if(Y<272){ doc.text(l,M,Y); Y+=5.5; } });
-  Y+=10; addSig('canvas-priv','sig-nombre-priv','NOMBRE Y FIRMA — Aviso de privacidad');
+
+  bodyText([
+    'Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V. (conjuntamente o cada uno de',
+    'ellos en lo individual como el "Responsable"), con domicilio en calle Mario Pani, numero 200,',
+    'Colonia Santa Fe Cuajimalpa, Cuajimalpa de Morelos, Codigo Postal 05348, Ciudad de Mexico,',
+    'utilizaran sus dato personales de identificacion y datos personales sensibles como estado de salud,',
+    'con las siguientes finalidades:',
+    '',
+    '  •  Verificar su identidad e informacion;',
+    '  •  Integrar su expediente;',
+    '  •  Actualizar su informacion en nuestra base de datos;',
+    '  •  Prestar los servicios solicitados y llevar a cabo la venta de productos solicitados por usted',
+    '     (incluyendo sin limitar los servicios de venta fisica, por telefono e internet); y',
+    '  •  Prestar los servicios solicitados y llevar a cabo la venta de productos solicitados por usted',
+    '     (incluyendo sin limitar los servicios de venta fisica, por telefono e internet).',
+    '',
+    'Para mayor informacion sobre el tratamiento de sus datos personales y los derechos que tiene,',
+    'consulte el Aviso de Privacidad Integral Clientes en la pagina www.liverpool.com.mx en la',
+    'seccion Avisos de Privacidad.'
+  ]);
+
+  Y += 6;
+  addSig('canvas-priv','sig-nombre-priv','Nombre y Firma del cliente — Aviso de Privacidad');
 
   footer();
   return doc;
