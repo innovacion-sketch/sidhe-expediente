@@ -131,6 +131,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-primary{background:var(--accent);border-color:var(--accent);color:white}
 .btn-primary:hover{background:#152f3e;color:white}
 .btn-danger{background:var(--red-bg);border-color:var(--red);color:var(--red);font-size:12px;padding:7px 14px}
+.btn-finalizar{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:var(--primary);border:none;border-radius:var(--radius);color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s,background 0.2s}
+.btn-finalizar:hover{opacity:0.9}
+.btn-finalizar:disabled{opacity:0.5;cursor:not-allowed}
 .btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25D366;border:none;border-radius:var(--radius);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
 .btn-wa:active{opacity:0.85}
 .btn-drive{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
@@ -504,7 +507,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="canvas-wrap"><canvas id="canvas-priv" height="200"></canvas><div class="canvas-hint" id="hint-priv">Firmar aquí con el dedo o mouse</div></div>
     <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-priv','hint-priv')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
   </div>
-  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="if(panelValidations[3]()){goTo(4);buildSummary();autoGuardarYEnviar();}">Ver resumen →</button></div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="if(panelValidations[3]()){goTo(4);buildSummary();}">Ver resumen →</button></div>
 </div>
 </div>
 
@@ -521,38 +524,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div id="summary-content"></div>
   <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
 
-    <!-- Estado Drive -->
-    <div class="drive-status uploading" id="drive-status">
-      ⏳ Guardando expediente en Google Drive…
+    <!-- Botón Finalizar -->
+    <button class="btn-finalizar" id="btn-finalizar" onclick="finalizar()">
+      ✅ Finalizar y enviar expediente
+    </button>
+
+    <!-- Estados (ocultos hasta que se presione Finalizar) -->
+    <div id="estados-envio" style="display:none;margin-top:12px">
+      <div class="drive-status pending" id="drive-status">📂 Subiendo a Google Drive…</div>
+      <div class="drive-status pending" id="wa-status" style="margin-top:8px">📱 Enviando WhatsApp…</div>
     </div>
-
-    <!-- Botón Drive (respaldo manual) -->
-    <button class="btn-drive" id="btn-drive" onclick="subirDrive()" style="display:none">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Reintentar guardar en Google Drive
-    </button>
-
-    <!-- Estado WhatsApp N8N -->
-    <div class="drive-status pending" id="wa-status" style="margin-top:8px">
-      📱 WhatsApp se enviará automáticamente al guardar…
-    </div>
-
-    <!-- Botón descarga PDF -->
-    <button class="btn-download" id="btn-download" onclick="descargarPDF()" style="margin-top:10px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      Descargar PDF localmente (respaldo)
-    </button>
-
-    <!-- Botón WhatsApp manual (respaldo) -->
-    <button class="btn-wa" id="btn-wa" onclick="sendWhatsAppN8N()" style="opacity:0.4;pointer-events:none">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Reenviar WhatsApp manualmente
-    </button>
 
   </div>
-  <div class="nav-row">
+  <div class="nav-row" id="nav-resumen">
     <button class="btn" onclick="prev()">← Anterior</button>
-    <button class="btn btn-primary" onclick="resetAll()">+ Nuevo cliente</button>
+    <button class="btn btn-primary" id="btn-nuevo" onclick="resetAll()" style="display:none">+ Nuevo cliente</button>
   </div>
 </div>
 </div>
@@ -1170,19 +1156,33 @@ function descargarPDF() {
   }
 }
 
-// ── AUTO GUARDAR Y ENVIAR ────────────────────────────────────
-async function autoGuardarYEnviar() {
-  await new Promise(function(r){ setTimeout(r, 700); });
-  await subirDrive();
+// ── FINALIZAR: sube a Drive y luego manda N8N ───────────────
+async function finalizar() {
+  var btn = document.getElementById('btn-finalizar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Procesando…';
+
+  // Mostrar estados
+  document.getElementById('estados-envio').style.display = 'block';
+
+  // 1. Subir a Drive
+  var driveOk = await subirDrive();
+
+  // 2. Si Drive OK → mandar N8N
+  if (driveOk) {
+    await sendWhatsAppN8N();
+  }
+
+  // Ocultar botón finalizar, mostrar "Nuevo cliente"
+  btn.style.display = 'none';
+  document.getElementById('btn-nuevo').style.display = '';
 }
 
 // ── SUBIR A DRIVE ─────────────────────────────────────────────
 async function subirDrive() {
   var statusEl = document.getElementById('drive-status');
-  var btnEl    = document.getElementById('btn-drive');
-
   statusEl.className = 'drive-status uploading';
-  statusEl.textContent = '⏳ Generando PDF y subiendo a Drive...';
+  statusEl.textContent = '⏳ Subiendo expediente a Google Drive…';
 
   try {
     var doc    = generarPDF();
@@ -1191,19 +1191,15 @@ async function subirDrive() {
     var motivos    = getChecked('motivos');
     var otroMotivo = v('otro-motivo'); if(otroMotivo !== '—') motivos.push(otroMotivo);
     var valoracion = getChecked('valoracion');
-
-    var now = new Date();
+    var now  = new Date();
     var hora = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
     var payload = {
-      // PDF
       pdf:           pdfB64,
-      // Identificación
       sucursal:      sucursalActual || 'Sin sucursal',
       especialista:  v('especialista'),
       fecha:         v('fecha'),
       hora:          hora,
-      // Datos personales
       nombre:        v('nombre'),
       edad:          v('edad'),
       telefono:      v('tel'),
@@ -1213,11 +1209,9 @@ async function subirDrive() {
       estatura:      v('estatura'),
       peso:          v('peso'),
       como_entero:   v('enterado'),
-      // Motivo y clínica
       motivos:       motivos.join(', '),
       dolor:         dolorSelected.join(', ') || 'Sin dolor reportado',
       valoracion:    valoracion.join(', ') || 'Sin hallazgos',
-      // Plantilla
       talla:         v('talla'),
       calzado:       v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado'),
       num_plantilla: v('num-plantilla'),
@@ -1225,35 +1219,33 @@ async function subirDrive() {
       entrega:       v('entrega'),
     };
 
-    var res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-
+    var res  = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
     var data = await res.json();
+
     if (data.ok) {
-      pdfDriveUrl = data.url || "";
+      pdfDriveUrl = data.url || '';
       statusEl.className = 'drive-status done';
       statusEl.innerHTML = '✓ Guardado en Drive: <strong>' + sucursalActual + '</strong> → ' + v('nombre');
-      if(btnEl) btnEl.style.display = 'none';
-      // Enviar WhatsApp vía N8N automáticamente
-      await sendWhatsAppN8N();
+      return true;
     } else {
       throw new Error(data.error || 'Error desconocido');
     }
   } catch(err) {
     statusEl.className = 'drive-status error';
     statusEl.textContent = '✗ Error al subir a Drive: ' + err.message;
-    if(btnEl){ btnEl.style.display=''; btnEl.textContent='Reintentar guardar en Drive'; }
+    // Re-habilitar botón para que puedan reintentar
+    var btn = document.getElementById('btn-finalizar');
+    btn.disabled = false;
+    btn.textContent = '🔄 Reintentar';
+    return false;
   }
 }
 
 // ── ENVIAR WHATSAPP VÍA N8N ──────────────────────────────────
 async function sendWhatsAppN8N() {
   var waStatusEl = document.getElementById('wa-status');
-  var waBtnEl    = document.getElementById('btn-wa');
   waStatusEl.className = 'drive-status uploading';
-  waStatusEl.textContent = '⏳ Enviando WhatsApp al cliente vía N8N…';
+  waStatusEl.textContent = '⏳ Enviando WhatsApp al cliente…';
 
   var rawTel = document.getElementById('tel').value.replace(/\D/g,'');
   if (!rawTel.startsWith('52')) rawTel = '52' + rawTel;
@@ -1280,19 +1272,14 @@ async function sendWhatsAppN8N() {
     if (res.ok) {
       waStatusEl.className = 'drive-status done';
       waStatusEl.textContent = '✓ WhatsApp enviado a ' + v('nombre') + ' (' + document.getElementById('tel').value + ')';
-      waBtnEl.style.opacity = '1';
-      waBtnEl.style.pointerEvents = 'auto';
     } else {
       throw new Error('HTTP ' + res.status);
     }
   } catch(err) {
     waStatusEl.className = 'drive-status error';
     waStatusEl.textContent = '✗ Error al enviar WhatsApp: ' + err.message;
-    waBtnEl.style.opacity = '1';
-    waBtnEl.style.pointerEvents = 'auto';
   }
 }
-
 // ── RESUMEN ──────────────────────────────────────────────────
 function buildSummary() {
   var motivos = getChecked('motivos');
@@ -1341,21 +1328,16 @@ function resetAll() {
   document.getElementById('fecha').value = yyyy+'-'+mm+'-'+dd;
   document.getElementById('summary-content').innerHTML = '';
   pdfDriveUrl = '';
-  // Reset drive status
+  // Reset estados
   var ds = document.getElementById('drive-status');
-  ds.className = 'drive-status uploading';
-  ds.textContent = '⏳ Guardando expediente en Google Drive…';
-  // Reset wa status
+  ds.className = 'drive-status pending'; ds.textContent = '📂 Subiendo a Google Drive…';
   var ws = document.getElementById('wa-status');
-  ws.className = 'drive-status pending';
-  ws.textContent = '📱 WhatsApp se enviará automáticamente al guardar…';
-  // Reset botón drive (oculto por defecto)
-  var bd = document.getElementById('btn-drive');
-  bd.style.display = 'none';
-  // Reset botón WA (deshabilitado por defecto)
-  var bwa = document.getElementById('btn-wa');
-  bwa.style.opacity = '0.4';
-  bwa.style.pointerEvents = 'none';
+  ws.className = 'drive-status pending'; ws.textContent = '📱 Enviando WhatsApp…';
+  document.getElementById('estados-envio').style.display = 'none';
+  var bf = document.getElementById('btn-finalizar');
+  bf.style.display = ''; bf.disabled = false; bf.textContent = '✅ Finalizar y enviar expediente';
+  document.getElementById('btn-nuevo').style.display = 'none';
+
   goTo(0);
   document.getElementById('modal-sucursal').classList.add('open');
 }
