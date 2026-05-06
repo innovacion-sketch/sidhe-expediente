@@ -99,6 +99,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .side-btn{padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all 0.15s;font-family:'DM Sans',sans-serif}
 .side-btn.on{background:var(--red-bg);border-color:var(--red);color:var(--red)}
 
+/* ── VALORACIÓN ─────────────────────────────────────────────── */
+.valoracion-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.val-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.val-name{font-size:13px;font-weight:500;color:var(--text);min-width:80px}
+.val-btns{display:flex;gap:6px;flex-wrap:wrap}
+.val-btn{padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.val-btn.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.val-btn.on.neutro{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+
+/* ── TEXTAREA ───────────────────────────────────────────────── */
+.field textarea{font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);transition:border 0.2s,background 0.2s,box-shadow 0.2s;outline:none;resize:vertical;min-height:90px;line-height:1.5}
+.field textarea:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(27,58,75,0.09)}
+
 /* ── DOCUMENT SCROLL ─────────────────────────────────────────── */
 .doc-scroll{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;max-height:240px;overflow-y:auto;margin-bottom:1rem}
 .doc-scroll::-webkit-scrollbar{width:4px}
@@ -133,7 +146,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-danger{background:var(--red-bg);border-color:var(--red);color:var(--red);font-size:12px;padding:7px 14px}
 .btn-finalizar{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s;margin-bottom:4px;box-shadow:0 4px 14px rgba(27,58,75,0.25)}
 .btn-finalizar:hover{opacity:0.9}
-.btn-finalizar:disabled{opacity:0.5;cursor:not-allowed}
+.btn-finalizar:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
+.btn-wa{background:#25D366;box-shadow:0 4px 14px rgba(37,211,102,0.3)}
+.btn-wa:hover{background:#1FB855}
+
+/* ── TICKET ─────────────────────────────────────────────────── */
+.ticket-zone{margin-top:1rem;padding:24px;border:2px dashed var(--border2);border-radius:var(--radius-lg);background:var(--surface2);text-align:center;min-height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.ticket-zone.has-photo{border-style:solid;background:white;padding:14px}
+.ticket-icon{font-size:54px;line-height:1;margin-bottom:14px;opacity:0.6}
+.ticket-hint{color:var(--text3);font-size:14px;margin-bottom:14px}
+.ticket-btn{display:inline-block;cursor:pointer}
+#ticket-preview{max-width:100%;max-height:420px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,0.08);display:block;margin:0 auto}
+.ticket-actions{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
+.ticket-actions label{cursor:pointer}
 .btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25D366;border:none;border-radius:var(--radius);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
 .btn-wa:active{opacity:0.85}
 .btn-drive{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
@@ -337,7 +362,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="step-tab" onclick="goTo(1)" id="step1"><div class="step-icon">2</div>Consentimiento</button>
     <button class="step-tab" onclick="goTo(2)" id="step2"><div class="step-icon">3</div>Instrucciones</button>
     <button class="step-tab" onclick="goTo(3)" id="step3"><div class="step-icon">4</div>Privacidad</button>
-    <button class="step-tab" onclick="goTo(4)" id="step4"><div class="step-icon">✓</div>Finalizar</button>
+    <button class="step-tab" onclick="goTo(4)" id="step4"><div class="step-icon">5</div>Ticket</button>
+    <button class="step-tab" onclick="goTo(5)" id="step5"><div class="step-icon">✓</div>Finalizar</button>
   </div>
 </div>
 
@@ -357,13 +383,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="sdiv"><span>Información personal</span></div>
   <div class="form-grid cols2">
     <div class="field"><label>Nombre completo <span style="color:var(--red)">*</span></label><input id="nombre" placeholder="Nombre del cliente"/><span class="err-msg">Campo obligatorio</span></div>
-    <div class="field"><label>Edad <span style="color:var(--red)">*</span></label><input id="edad" type="number" placeholder="Años" min="1" max="120"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Sexo <span style="color:var(--red)">*</span></label><select id="sexo"><option value="">Seleccionar...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select><span class="err-msg">Campo obligatorio</span></div>
   </div>
   <div class="form-grid cols2">
+    <div class="field"><label>Edad <span style="color:var(--red)">*</span></label><input id="edad" type="number" placeholder="Años" min="1" max="120"/><span class="err-msg">Campo obligatorio</span></div>
     <div class="field"><label>Teléfono WhatsApp <span style="color:var(--red)">*</span></label><input id="tel" placeholder="55 1234 5678" inputmode="numeric"/><span class="err-msg">Campo obligatorio (mínimo 10 dígitos)</span></div>
-    <div class="field"><label>Ocupación <span style="color:var(--red)">*</span></label><input id="ocup" placeholder="Ocupación"/><span class="err-msg">Campo obligatorio</span></div>
   </div>
-  <div class="form-grid cols1">
+  <div class="form-grid cols2">
+    <div class="field"><label>Ocupación <span style="color:var(--red)">*</span></label><input id="ocup" placeholder="Ocupación"/><span class="err-msg">Campo obligatorio</span></div>
     <div class="field"><label>Correo electrónico <span style="color:var(--red)">*</span></label><input id="email" type="email" placeholder="ejemplo@correo.com" inputmode="email"/><span class="err-msg">Ingresa un correo válido</span></div>
   </div>
   <div class="form-grid cols3">
@@ -372,6 +399,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="field"><label>Peso</label><input id="peso" placeholder="70 kg"/></div>
   </div>
   <div class="form-grid cols1"><div class="field"><label>¿Cómo se enteró de nosotros?</label><input id="enterado" placeholder="Redes sociales, recomendación, Liverpool..."/></div></div>
+
+  <div class="sdiv"><span>Antecedentes clínicos</span></div>
+  <div class="form-grid cols1">
+    <div class="field"><label>Antecedentes médicos</label><input id="antecedentes" placeholder="p. ej. diabetes, hipertensión, artritis..."/></div>
+  </div>
+  <div class="form-grid cols1">
+    <div class="field"><label>Cirugías previas</label><input id="cirugias" placeholder="p. ej. cirugía de juanete en pie derecho (2020)"/></div>
+  </div>
+  <div class="form-grid cols2">
+    <div class="field"><label>¿Ha tenido fracturas? <span style="color:var(--red)">*</span></label>
+      <select id="fracturas-bool" onchange="toggleFracturas()">
+        <option value="">Seleccionar...</option>
+        <option value="No">No</option>
+        <option value="Sí">Sí</option>
+      </select>
+      <span class="err-msg">Campo obligatorio</span>
+    </div>
+    <div class="field" id="fracturas-detalle-wrap" style="display:none">
+      <label>Detalle de fracturas</label>
+      <input id="fracturas-detalle" placeholder="Zona, año, lado..."/>
+    </div>
+  </div>
+  <div class="form-grid cols1">
+    <div class="field"><label>Tipo de pisada (si la observan)</label><input id="pisada" placeholder="p. ej. pronadora, supinadora, neutra..."/></div>
+  </div>
 
   <div class="sdiv"><span>Motivo de visita</span></div>
   <div class="checks-grid" id="motivos">
@@ -392,22 +444,62 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="dolor-card"><span class="dolor-name">Pies</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Pies izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Pies der')">Der</button></div></div>
     <div class="dolor-card"><span class="dolor-name">Tobillos</span><div class="side-btns"><button class="side-btn" onclick="toggleDolor(this,'Tobillos izq')">Izq</button><button class="side-btn" onclick="toggleDolor(this,'Tobillos der')">Der</button></div></div>
   </div>
+  <div class="form-grid cols1" style="margin-top:12px">
+    <div class="field"><label>Otras zonas de dolor / detalle</label><input id="otro-dolor" placeholder="Especificar otras zonas o detalles del dolor..."/></div>
+  </div>
 
   <div class="sdiv"><span>Valoración clínica</span></div>
-  <div class="checks-grid" id="valoracion">
-    <label class="check-item"><input type="checkbox" value="Varo de rodillas"><span>Varo de rodillas</span></label>
-    <label class="check-item"><input type="checkbox" value="Valgo de rodillas"><span>Valgo de rodillas</span></label>
-    <label class="check-item"><input type="checkbox" value="Valgo del retropié"><span>Valgo del retropié</span></label>
-    <label class="check-item"><input type="checkbox" value="Varo del retropié"><span>Varo del retropié</span></label>
-    <label class="check-item"><input type="checkbox" value="Pronación"><span>Pronación</span></label>
-    <label class="check-item"><input type="checkbox" value="Supinación"><span>Supinación</span></label>
+  <div class="valoracion-grid" id="valoracion-grupo">
+    <div class="val-card">
+      <span class="val-name">Rodillas</span>
+      <div class="val-btns">
+        <button class="val-btn" onclick="setValoracion(this,'rodillas','Varo de rodillas')">Varo</button>
+        <button class="val-btn" onclick="setValoracion(this,'rodillas','Valgo de rodillas')">Valgo</button>
+        <button class="val-btn" onclick="setValoracion(this,'rodillas','Rodillas neutras')">Neutro</button>
+      </div>
+    </div>
+    <div class="val-card">
+      <span class="val-name">Retropié</span>
+      <div class="val-btns">
+        <button class="val-btn" onclick="setValoracion(this,'retropie','Varo del retropié')">Varo</button>
+        <button class="val-btn" onclick="setValoracion(this,'retropie','Valgo del retropié')">Valgo</button>
+        <button class="val-btn" onclick="setValoracion(this,'retropie','Retropié neutro')">Neutro</button>
+      </div>
+    </div>
+    <div class="val-card">
+      <span class="val-name">Pisada</span>
+      <div class="val-btns">
+        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Pronación')">Pronación</button>
+        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Supinación')">Supinación</button>
+        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Pisada neutra')">Neutro</button>
+      </div>
+    </div>
+  </div>
+  <div class="form-grid cols1" style="margin-top:12px">
+    <div class="field"><label>Otros hallazgos clínicos</label><input id="otro-valoracion" placeholder="Especificar otros hallazgos relevantes..."/></div>
   </div>
 
   <div class="sdiv"><span>Datos de plantilla</span></div>
   <div class="form-grid cols3">
     <div class="field"><label>Tipo de calzado <span style="color:var(--red)">*</span></label><input id="tipo-calzado" placeholder="p. ej. tenis"/><span class="err-msg">Campo obligatorio</span></div>
     <div class="field"><label>Número de plantilla <span style="color:var(--red)">*</span></label><input id="num-plantilla" placeholder="p. ej. 26"/><span class="err-msg">Campo obligatorio</span></div>
-    <div class="field"><label>Horma <span style="color:var(--red)">*</span></label><input id="horma" placeholder="p. ej. estándar"/><span class="err-msg">Campo obligatorio</span></div>
+    <div class="field"><label>Horma <span style="color:var(--red)">*</span></label>
+      <select id="horma">
+        <option value="">Seleccionar...</option>
+        <option value="Clásica">Clásica</option>
+        <option value="Estrecha">Estrecha</option>
+        <option value="3/4">3/4</option>
+        <option value="Deportiva">Deportiva</option>
+      </select>
+      <span class="err-msg">Campo obligatorio</span>
+    </div>
+  </div>
+
+  <div class="sdiv"><span>Observaciones generales</span></div>
+  <div class="form-grid cols1">
+    <div class="field"><label>Notas adicionales del especialista</label>
+      <textarea id="observaciones" rows="4" placeholder="Anotar cualquier información relevante que no se haya capturado en los campos anteriores..."></textarea>
+    </div>
   </div>
   <div class="nav-row"><div></div><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
 </div>
@@ -507,32 +599,82 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="canvas-wrap"><canvas id="canvas-priv" height="200"></canvas><div class="canvas-hint" id="hint-priv">Firmar aquí con el dedo o mouse</div></div>
     <div class="sig-actions"><button class="btn btn-danger" onclick="clearCanvas('canvas-priv','hint-priv')">✕ Limpiar</button><span>Toca o arrastra para firmar</span></div>
   </div>
-  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="if(panelValidations[3]()){goTo(4);buildSummary();}">Ver resumen →</button></div>
+  <div class="nav-row"><button class="btn" onclick="prev()">← Anterior</button><button class="btn btn-primary" onclick="if(panelValidations[3]()){goTo(4);}">Continuar →</button></div>
 </div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════
-     PANEL 4 — FINALIZAR
+     PANEL 4 — FOTO DE TICKET
 ═════════════════════════════════════════════════════════════ -->
 <div class="panel" id="panel4">
+<div class="card">
+  <h2>Foto del ticket de compra</h2>
+  <p class="muted">Toma una foto clara del ticket. Se anexará al final del expediente PDF.</p>
+
+  <div class="ticket-zone" id="ticket-zone">
+    <!-- Estado vacío -->
+    <div id="ticket-empty">
+      <div class="ticket-icon">📷</div>
+      <p class="ticket-hint">No se ha capturado ninguna foto</p>
+      <label for="ticket-input" class="btn btn-primary ticket-btn">📸 Tomar / elegir foto</label>
+      <input id="ticket-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
+    </div>
+    <!-- Vista previa (se muestra tras seleccionar) -->
+    <div id="ticket-preview-wrap" style="display:none">
+      <img id="ticket-preview" alt="Ticket" />
+      <div class="ticket-actions">
+        <label for="ticket-input-2" class="btn">🔄 Retomar foto</label>
+        <input id="ticket-input-2" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
+        <button class="btn btn-danger" onclick="removeTicket()">✕ Quitar</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="muted" style="margin-top:12px;font-size:12px">
+    💡 La foto se guarda solo en tu dispositivo hasta que finalices el expediente. No se sube a internet hasta entonces.
+  </p>
+
+  <div class="nav-row">
+    <button class="btn" onclick="prev()">← Anterior</button>
+    <button class="btn btn-primary" onclick="if(panelValidations[4]()){goTo(5);buildSummary();}">Ver resumen →</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL 5 — FINALIZAR
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel5">
 <div class="card">
   <div class="summary-header">
     <div class="check-circle">✓</div>
     <h2>Expediente completado</h2>
-    <p id="summary-subtitle">Los 4 documentos han sido firmados.</p>
+    <p id="summary-subtitle">Documentos firmados y ticket capturado.</p>
   </div>
   <div id="summary-content"></div>
   <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
 
-    <!-- Botón Finalizar -->
-    <button class="btn-finalizar" id="btn-finalizar" onclick="finalizar()">
-      ✅ Finalizar y enviar expediente
+    <!-- Botón 1: Guardar en Drive -->
+    <button class="btn-finalizar" id="btn-guardar-drive" onclick="guardarEnDrive()">
+      💾 Guardar expediente en Drive
     </button>
 
-    <!-- Estados (ocultos hasta que se presione Finalizar) -->
-    <div id="estados-envio" style="display:none;margin-top:12px">
+    <!-- Estado Drive -->
+    <div id="drive-status-wrap" style="display:none;margin-top:12px">
       <div class="drive-status pending" id="drive-status">📂 Subiendo a Google Drive…</div>
-      <div class="drive-status pending" id="wa-status" style="margin-top:8px">📱 Enviando WhatsApp…</div>
+    </div>
+
+    <!-- Botón 2: WhatsApp (deshabilitado hasta que Drive termine) -->
+    <button class="btn-finalizar btn-wa" id="btn-enviar-wa" onclick="enviarPorWhatsapp()" disabled style="margin-top:12px">
+      💬 Enviar por WhatsApp
+    </button>
+    <p class="muted" style="font-size:12px;margin-top:8px;text-align:center">
+      Se abrirá WhatsApp Web. Si ya iniciaste sesión, no pedirá QR.
+    </p>
+
+    <!-- Estado WhatsApp -->
+    <div id="wa-status-wrap" style="display:none;margin-top:12px">
+      <div class="drive-status pending" id="wa-status">📱 WhatsApp Web abierto en otra pestaña</div>
     </div>
 
   </div>
@@ -554,7 +696,9 @@ var pdfDriveUrl = ""; // Se llena cuando Drive responde OK
 
 var currentStep = 0;
 var dolorSelected = [];
+var valoracionSelected = {}; // { rodillas: 'Varo de rodillas', retropie: 'Valgo del retropié', 'pisada-val': 'Pronación' }
 var sucursalActual = "";
+var ticketImageData = null; // dataURL JPEG de la foto del ticket
 
 // Fecha
 var today = new Date();
@@ -590,10 +734,12 @@ var panelValidations = {
       { id:'especialista', check: function(v){ return v.trim().length > 0; } },
       { id:'fecha',        check: function(v){ return v.trim().length > 0; } },
       { id:'nombre',       check: function(v){ return v.trim().length > 0; } },
+      { id:'sexo',         check: function(v){ return v.trim().length > 0; } },
       { id:'edad',         check: function(v){ return v.trim().length > 0 && parseInt(v) > 0; } },
       { id:'tel',          check: function(v){ return v.replace(/\D/g,'').length >= 10; } },
       { id:'ocup',         check: function(v){ return v.trim().length > 0; } },
       { id:'email',        check: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); } },
+      { id:'fracturas-bool', check: function(v){ return v.trim().length > 0; } },
       { id:'tipo-calzado', check: function(v){ return v.trim().length > 0; } },
       { id:'num-plantilla',check: function(v){ return v.trim().length > 0; } },
       { id:'horma',        check: function(v){ return v.trim().length > 0; } },
@@ -631,6 +777,13 @@ var panelValidations = {
     if (!acepto) { showToast('☑ El cliente debe aceptar el aviso de privacidad'); return false; }
     if (!nameOk) { showToast('✍ Escribe el nombre en la firma de privacidad'); return false; }
     if (!canvasOk) { showToast('✍ El cliente debe firmar el aviso de privacidad'); return false; }
+    return true;
+  },
+  4: function() {
+    if (!ticketImageData) {
+      showToast('📷 Toma la foto del ticket antes de continuar');
+      return false;
+    }
     return true;
   }
 };
@@ -673,7 +826,7 @@ function canvasHasContent(id) {
 }
 
 // Limpiar error al escribir
-document.querySelectorAll('.field input, .field select').forEach(function(el) {
+document.querySelectorAll('.field input, .field select, .field textarea').forEach(function(el) {
   el.addEventListener('input', function(){ el.classList.remove('error'); });
   el.addEventListener('change', function(){ el.classList.remove('error'); });
 });
@@ -686,18 +839,18 @@ function goTo(n) {
   if (n > currentStep) prevTab.classList.add('done');
   currentStep = n;
   document.getElementById('panel'+n).classList.add('active');
-  for (var i=0;i<5;i++) {
+  for (var i=0;i<6;i++) {
     var t = document.getElementById('step'+i);
     t.classList.remove('active');
     if (i < n) t.classList.add('done'); else if (i > n) t.classList.remove('done');
   }
   document.getElementById('step'+n).classList.add('active');
-  document.getElementById('prog-fill').style.width = (n/4*100) + '%';
+  document.getElementById('prog-fill').style.width = (n/5*100) + '%';
   window.scrollTo(0,0);
 }
 
 function next() {
-  if (currentStep < 4) {
+  if (currentStep < 5) {
     var validator = panelValidations[currentStep];
     if (validator && !validator()) return;
     goTo(currentStep + 1);
@@ -717,6 +870,75 @@ function toggleDolor(btn, label) {
   btn.classList.toggle('on');
   var idx = dolorSelected.indexOf(label);
   if (idx > -1) dolorSelected.splice(idx,1); else dolorSelected.push(label);
+}
+
+// Fracturas: mostrar/ocultar campo de detalle
+function toggleFracturas() {
+  var sel = document.getElementById('fracturas-bool').value;
+  var wrap = document.getElementById('fracturas-detalle-wrap');
+  wrap.style.display = (sel === 'Sí') ? '' : 'none';
+  if (sel !== 'Sí') document.getElementById('fracturas-detalle').value = '';
+}
+
+// Valoración: solo una opción por categoría (varo/valgo/neutro)
+function setValoracion(btn, categoria, label) {
+  var card = btn.parentElement;
+  var ya = btn.classList.contains('on');
+  // Limpiar todos los botones de esta categoría
+  card.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
+  if (ya) {
+    // Si ya estaba seleccionado, deseleccionar
+    delete valoracionSelected[categoria];
+  } else {
+    btn.classList.add('on');
+    // Marcar visualmente diferente si es Neutro
+    if (label.toLowerCase().indexOf('neutr') !== -1) btn.classList.add('neutro');
+    valoracionSelected[categoria] = label;
+  }
+}
+
+// ── TICKET ────────────────────────────────────────────────────
+function onTicketSelected(ev) {
+  var file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  if (!/^image\//i.test(file.type)) {
+    showToast('⚠ El archivo debe ser una imagen');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Comprimir a JPEG ~1600px máx para reducir tamaño antes de subir a Drive
+    var img = new Image();
+    img.onload = function() {
+      var maxDim = 1600;
+      var w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      ticketImageData = canvas.toDataURL('image/jpeg', 0.82);
+      // Mostrar preview
+      document.getElementById('ticket-preview').src = ticketImageData;
+      document.getElementById('ticket-empty').style.display = 'none';
+      document.getElementById('ticket-preview-wrap').style.display = '';
+      document.getElementById('ticket-zone').classList.add('has-photo');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // Limpiar el input para permitir volver a seleccionar el mismo archivo
+  ev.target.value = '';
+}
+
+function removeTicket() {
+  ticketImageData = null;
+  document.getElementById('ticket-preview').src = '';
+  document.getElementById('ticket-empty').style.display = '';
+  document.getElementById('ticket-preview-wrap').style.display = 'none';
+  document.getElementById('ticket-zone').classList.remove('has-photo');
 }
 
 // Firmas
@@ -955,7 +1177,18 @@ function generarPDF() {
   var currentPage = 1;
   var motivos = getChecked('motivos');
   var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  var valoracion = getChecked('valoracion');
+  // Construir array de valoración a partir de valoracionSelected + campo libre
+  var valoracion = Object.values(valoracionSelected || {});
+  var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
+
+  // Construir dolor con campo libre
+  var dolorList = dolorSelected.slice();
+  var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
+
+  // Fracturas: combinar Sí/No con detalle
+  var fractText = v('fracturas-bool');
+  var fractDet = v('fracturas-detalle');
+  if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
 
   // ════════════════════════════════════════════════════════════
   // PÁGINA 1 — DATOS DEL CLIENTE
@@ -965,18 +1198,25 @@ function generarPDF() {
 
   section('DATOS PERSONALES');
   row('Nombre completo', v('nombre'), false);
-  row2('Edad', v('edad')+' años', 'Teléfono', v('tel'), true);
-  row2('Correo', v('email'), 'Ocupación', v('ocup'), false);
-  row2('Estatura', v('estatura'), 'Peso', v('peso'), true);
-  row2('Actividad física', v('actfis'), '¿Cómo se enteró?', v('enterado'), false);
-  row('Especialista', v('especialista'), true);
-  row('Sucursal', sucursalActual, false);
+  row2('Sexo', v('sexo'), 'Edad', v('edad')+' años', true);
+  row2('Teléfono', v('tel'), 'Correo', v('email'), false);
+  row2('Ocupación', v('ocup'), 'Actividad física', v('actfis'), true);
+  row2('Estatura', v('estatura'), 'Peso', v('peso'), false);
+  row('¿Cómo se enteró?', v('enterado'), true);
+  row('Especialista', v('especialista'), false);
+  row('Sucursal', sucursalActual, true);
+
+  Y += 2; section('ANTECEDENTES CLÍNICOS');
+  row('Antecedentes médicos', v('antecedentes'), false);
+  row('Cirugías previas', v('cirugias'), true);
+  row('Fracturas', fractText, false);
+  row('Tipo de pisada', v('pisada'), true);
 
   Y += 2; section('MOTIVO DE VISITA');
   row('Motivos', motivos.join(' | ') || 'No especificado', false);
 
   Y += 2; section('ZONAS DE DOLOR');
-  row('Dolor reportado', dolorSelected.join(' | ') || 'Sin dolor reportado', false);
+  row('Dolor reportado', dolorList.join(' | ') || 'Sin dolor reportado', false);
 
   Y += 2; section('VALORACIÓN CLÍNICA');
   row('Hallazgos', valoracion.join(' | ') || 'Sin hallazgos marcados', false);
@@ -985,6 +1225,22 @@ function generarPDF() {
   row2('Talla', v('talla'), 'Número', v('num-plantilla'), false);
   row2('Tipo de calzado', v('tipo-calzado'), 'Horma', v('horma'), true);
   row('Fecha de entrega estimada', v('entrega'), false);
+
+  // Observaciones (solo si hay contenido)
+  var obs = v('observaciones');
+  if (obs && obs !== '—') {
+    Y += 2; section('OBSERVACIONES GENERALES');
+    // Wrap el texto largo
+    var obsLines = doc.splitTextToSize(obs, CW - 6);
+    doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
+    var blockH = obsLines.length * 4.2 + 6;
+    if(Y + blockH > 270) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
+    doc.rect(ML, Y-4, CW, blockH, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    doc.text(obsLines, ML+3, Y);
+    Y += blockH;
+  }
 
   Y += 6; ornament();
 
@@ -998,7 +1254,9 @@ function generarPDF() {
   doc.text('Documentos incluidos en este expediente:', ML+5, Y+7);
   doc.setFont('helvetica','normal'); doc.setFontSize(7);
   doc.setTextColor(C_GREEN[0],C_GREEN[1],C_GREEN[2]);
-  doc.text('✓  Consentimiento informado    ✓  Instrucciones de uso y cuidado    ✓  Aviso de privacidad', ML+5, Y+14);
+  var docsLine = '✓  Consentimiento informado    ✓  Instrucciones de uso y cuidado    ✓  Aviso de privacidad';
+  if (ticketImageData) docsLine += '    ✓  Ticket de compra';
+  doc.text(docsLine, ML+5, Y+14);
   Y += 25;
 
   // ════════════════════════════════════════════════════════════
@@ -1139,6 +1397,36 @@ function generarPDF() {
   Y += 6;
   addSig('canvas-priv','sig-nombre-priv','Nombre y Firma del cliente — Aviso de Privacidad');
 
+  // ════════════════════════════════════════════════════════════
+  // PÁGINA 5 — TICKET DE COMPRA
+  // ════════════════════════════════════════════════════════════
+  if (ticketImageData) {
+    doc.addPage(); currentDocTitle = 'Ticket de Compra'; currentPage = 5;
+    drawHeader(currentDocTitle, currentPage);
+    section('TICKET DE COMPRA');
+    try {
+      // Dimensionar manteniendo proporción dentro del área disponible
+      var img = new Image(); img.src = ticketImageData;
+      // Si la imagen ya cargó (preview reciente) usamos sus dims; si no, usamos defaults razonables
+      var iw = img.width || 1200, ih = img.height || 1600;
+      var maxW = CW;                    // ancho útil
+      var maxH = 286 - Y - 14;          // alto útil hasta antes del footer
+      var ratio = Math.min(maxW/iw, maxH/ih);
+      var pw = iw * ratio, ph = ih * ratio;
+      var px = ML + (CW - pw) / 2;      // centrado horizontal
+      doc.addImage(ticketImageData, 'JPEG', px, Y, pw, ph);
+      Y += ph + 4;
+      // Pie con la fecha
+      doc.setFont('helvetica','italic'); doc.setFontSize(8);
+      doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+      doc.text('Ticket capturado el ' + v('fecha') + ' — ' + sucursalActual, W/2, Y+3, {align:'center'});
+    } catch(e) {
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+      doc.text('No se pudo insertar la imagen del ticket.', ML, Y);
+    }
+  }
+
   footer();
   return doc;
 }
@@ -1156,30 +1444,14 @@ function descargarPDF() {
   }
 }
 
-// ── FINALIZAR: sube a Drive y luego manda N8N ───────────────
-async function finalizar() {
-  var btn = document.getElementById('btn-finalizar');
+// ── BOTÓN 1: GUARDAR EN DRIVE ────────────────────────────────
+async function guardarEnDrive() {
+  var btn = document.getElementById('btn-guardar-drive');
   btn.disabled = true;
   btn.textContent = '⏳ Procesando…';
 
-  // Mostrar estados
-  document.getElementById('estados-envio').style.display = 'block';
-
-  // 1. Subir a Drive
-  var driveOk = await subirDrive();
-
-  // 2. Si Drive OK → mandar N8N
-  if (driveOk) {
-    await sendWhatsAppN8N();
-  }
-
-  // Ocultar botón finalizar, mostrar "Nuevo cliente"
-  btn.style.display = 'none';
-  document.getElementById('btn-nuevo').style.display = '';
-}
-
-// ── SUBIR A DRIVE ─────────────────────────────────────────────
-async function subirDrive() {
+  var wrap = document.getElementById('drive-status-wrap');
+  wrap.style.display = 'block';
   var statusEl = document.getElementById('drive-status');
   statusEl.className = 'drive-status uploading';
   statusEl.textContent = '⏳ Subiendo expediente a Google Drive…';
@@ -1190,7 +1462,15 @@ async function subirDrive() {
 
     var motivos    = getChecked('motivos');
     var otroMotivo = v('otro-motivo'); if(otroMotivo !== '—') motivos.push(otroMotivo);
-    var valoracion = getChecked('valoracion');
+    var valoracion = Object.values(valoracionSelected || {});
+    var otroVal    = v('otro-valoracion'); if(otroVal !== '—') valoracion.push(otroVal);
+    var dolorList  = dolorSelected.slice();
+    var otroDolor  = v('otro-dolor'); if(otroDolor !== '—') dolorList.push(otroDolor);
+
+    var fractText = v('fracturas-bool');
+    var fractDet  = v('fracturas-detalle');
+    if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
+
     var now  = new Date();
     var hora = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
@@ -1201,6 +1481,7 @@ async function subirDrive() {
       fecha:         v('fecha'),
       hora:          hora,
       nombre:        v('nombre'),
+      sexo:          v('sexo'),
       edad:          v('edad'),
       telefono:      v('tel'),
       email:         v('email'),
@@ -1209,9 +1490,14 @@ async function subirDrive() {
       estatura:      v('estatura'),
       peso:          v('peso'),
       como_entero:   v('enterado'),
+      antecedentes:  v('antecedentes'),
+      cirugias:      v('cirugias'),
+      fracturas:     fractText,
+      pisada:        v('pisada'),
       motivos:       motivos.join(', '),
-      dolor:         dolorSelected.join(', ') || 'Sin dolor reportado',
+      dolor:         dolorList.join(', ') || 'Sin dolor reportado',
       valoracion:    valoracion.join(', ') || 'Sin hallazgos',
+      observaciones: v('observaciones'),
       talla:         v('talla'),
       calzado:       v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado'),
       num_plantilla: v('num-plantilla'),
@@ -1226,84 +1512,117 @@ async function subirDrive() {
       pdfDriveUrl = data.url || '';
       statusEl.className = 'drive-status done';
       statusEl.innerHTML = '✓ Guardado en Drive: <strong>' + sucursalActual + '</strong> → ' + v('nombre');
-      return true;
+      // Cambiar botón a "guardado"
+      btn.textContent = '✓ Guardado en Drive';
+      btn.style.background = 'var(--green)';
+      // Habilitar botón de WhatsApp
+      var wa = document.getElementById('btn-enviar-wa');
+      wa.disabled = false;
     } else {
       throw new Error(data.error || 'Error desconocido');
     }
   } catch(err) {
     statusEl.className = 'drive-status error';
     statusEl.textContent = '✗ Error al subir a Drive: ' + err.message;
-    // Re-habilitar botón para que puedan reintentar
-    var btn = document.getElementById('btn-finalizar');
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
-    return false;
   }
 }
 
-// ── ENVIAR WHATSAPP VÍA N8N ──────────────────────────────────
-async function sendWhatsAppN8N() {
-  var waStatusEl = document.getElementById('wa-status');
-  waStatusEl.className = 'drive-status uploading';
-  waStatusEl.textContent = '⏳ Enviando WhatsApp al cliente…';
-
-  var rawTel = document.getElementById('tel').value.replace(/\D/g,'');
-  if (!rawTel.startsWith('52')) rawTel = '52' + rawTel;
-  var calzado = v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado');
-
-  var payload = {
-    nombre:       v('nombre'),
-    telefono:     rawTel,
-    sucursal:     sucursalActual,
-    especialista: v('especialista'),
-    talla:        v('talla'),
-    calzado:      calzado,
-    entrega:      v('entrega'),
-    pdf_url:      pdfDriveUrl,
-    fecha:        v('fecha')
-  };
-
-  try {
-    var res = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      waStatusEl.className = 'drive-status done';
-      waStatusEl.textContent = '✓ WhatsApp enviado a ' + v('nombre') + ' (' + document.getElementById('tel').value + ')';
-    } else {
-      throw new Error('HTTP ' + res.status);
-    }
-  } catch(err) {
-    waStatusEl.className = 'drive-status error';
-    waStatusEl.textContent = '✗ Error al enviar WhatsApp: ' + err.message;
+// ── BOTÓN 2: ENVIAR POR WHATSAPP WEB ─────────────────────────
+function enviarPorWhatsapp() {
+  if (!pdfDriveUrl) {
+    showToast('⚠ Primero guarda el expediente en Drive');
+    return;
   }
+  // Normalizar teléfono: quitar todo lo que no sea dígito y forzar prefijo MX
+  var rawTel = document.getElementById('tel').value.replace(/\D/g,'');
+  if (rawTel.length === 10)        rawTel = '52' + rawTel;
+  else if (!rawTel.startsWith('52')) rawTel = '52' + rawTel;
+
+  var nombre  = v('nombre');
+  var calzado = v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado');
+  var entrega = v('entrega');
+
+  var msg =
+    '¡Hola ' + nombre + '! 👋\n\n' +
+    'Gracias por tu visita a *Sidhe* en *' + sucursalActual + '*.\n\n' +
+    'Tu expediente ha sido registrado correctamente. Aquí te compartimos el documento con todos los detalles de tu plantilla ortopédica:\n\n' +
+    '📄 ' + pdfDriveUrl + '\n\n' +
+    'Detalles:\n' +
+    '• Talla de plantilla: ' + v('talla') + '\n' +
+    '• Calzado: ' + calzado + '\n' +
+    '• Fecha estimada de entrega: ' + entrega + '\n\n' +
+    'Si tienes alguna duda, no dudes en contactarnos. ¡Que tengas un excelente día! 🦶✨';
+
+  // Usar web.whatsapp.com para forzar la versión web (mantiene la sesión iniciada en el navegador)
+  var url = 'https://web.whatsapp.com/send?phone=' + rawTel + '&text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+
+  // Mostrar estado
+  document.getElementById('wa-status-wrap').style.display = 'block';
+  var waStatusEl = document.getElementById('wa-status');
+  waStatusEl.className = 'drive-status done';
+  waStatusEl.innerHTML = '✓ WhatsApp Web abierto en otra pestaña — revísala y presiona <strong>Enviar</strong>';
+
+  var wa = document.getElementById('btn-enviar-wa');
+  wa.textContent = '↻ Reabrir WhatsApp Web';
+
+  // Mostrar botón "Nuevo cliente"
+  document.getElementById('btn-nuevo').style.display = '';
 }
 // ── RESUMEN ──────────────────────────────────────────────────
 function buildSummary() {
   var motivos = getChecked('motivos');
   var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  var val = getChecked('valoracion');
+  var val = Object.values(valoracionSelected || {});
+  var otroVal = v('otro-valoracion'); if(otroVal!=='—') val.push(otroVal);
+  var dolorList = dolorSelected.slice();
+  var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
+
+  var fractText = v('fracturas-bool');
+  var fractDet = v('fracturas-detalle');
+  if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
 
   var h = '<div class="sum-card"><h4>Datos del cliente</h4>';
   h += '<div class="sum-row"><span class="sum-key">Nombre</span><span class="sum-val">'+v('nombre')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Sexo</span><span class="sum-val">'+v('sexo')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Edad</span><span class="sum-val">'+v('edad')+' años</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Teléfono</span><span class="sum-val">'+v('tel')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Especialista</span><span class="sum-val">'+v('especialista')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
   h += '</div>';
+  h += '<div class="sum-card"><h4>Antecedentes clínicos</h4>';
+  h += '<div class="sum-row"><span class="sum-key">Antecedentes médicos</span><span class="sum-val">'+v('antecedentes')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Cirugías previas</span><span class="sum-val">'+v('cirugias')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Fracturas</span><span class="sum-val">'+fractText+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Tipo de pisada</span><span class="sum-val">'+v('pisada')+'</span></div>';
+  h += '</div>';
   h += '<div class="sum-card"><h4>Evaluación clínica</h4>';
   h += '<div class="sum-row"><span class="sum-key">Motivo</span><span class="sum-val">'+(motivos.length?motivos.join(', '):'No especificado')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+(dolorSelected.length?dolorSelected.join(', '):'Sin dolor')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+(dolorList.length?dolorList.join(', '):'Sin dolor')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Valoración</span><span class="sum-val">'+(val.length?val.join(', '):'Sin hallazgos')+'</span></div>';
   h += '</div>';
   h += '<div class="sum-card"><h4>Datos de plantilla</h4>';
   h += '<div class="sum-row"><span class="sum-key">Talla</span><span class="sum-val">'+v('talla')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Calzado</span><span class="sum-val">'+(v('calzado-cons')!=='—'?v('calzado-cons'):v('tipo-calzado'))+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Número</span><span class="sum-val">'+v('num-plantilla')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Horma</span><span class="sum-val">'+v('horma')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
   h += '</div>';
+  // Observaciones (solo si hay)
+  var obs = v('observaciones');
+  if (obs && obs !== '—') {
+    h += '<div class="sum-card"><h4>Observaciones</h4>';
+    h += '<div class="sum-row" style="display:block"><span class="sum-val" style="white-space:pre-wrap">'+obs+'</span></div>';
+    h += '</div>';
+  }
+  // Ticket de compra
+  if (ticketImageData) {
+    h += '<div class="sum-card"><h4>Ticket de compra</h4>';
+    h += '<div style="text-align:center;margin-top:8px"><img src="'+ticketImageData+'" alt="Ticket" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border)"/></div>';
+    h += '</div>';
+  }
   h += '<div class="sum-card" style="background:var(--green-bg);border-color:var(--green-border)"><h4 style="color:var(--green)">Documentos firmados</h4>';
   h += '<div class="sum-row"><span class="sum-key">Consentimiento informado</span><span class="signed-pill">✓ Firmado</span></div>';
   h += '<div class="sum-row" style="margin-top:6px"><span class="sum-key">Instrucciones de uso</span><span class="signed-pill">✓ Firmado</span></div>';
@@ -1316,11 +1635,18 @@ function buildSummary() {
 
 // ── RESET ─────────────────────────────────────────────────────
 function resetAll() {
-  document.querySelectorAll('input[type=text],input[type=number],input[type=date]').forEach(function(i){ i.value=''; });
+  document.querySelectorAll('input[type=text],input[type=number],input[type=date],input[type=email],textarea').forEach(function(i){ i.value=''; });
+  document.querySelectorAll('select').forEach(function(s){ s.value=''; });
   document.querySelectorAll('input[type=checkbox]').forEach(function(cb){ cb.checked=false; });
   document.querySelectorAll('.check-item').forEach(function(i){ i.classList.remove('checked'); });
   document.querySelectorAll('.side-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
   dolorSelected = [];
+  valoracionSelected = {};
+  // Ocultar detalle de fracturas
+  document.getElementById('fracturas-detalle-wrap').style.display = 'none';
+  // Limpiar ticket
+  removeTicket();
   ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
     var c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height);
     var h=document.getElementById('hint-'+id.replace('canvas-','')); if(h) h.style.opacity='1';
@@ -1328,14 +1654,23 @@ function resetAll() {
   document.getElementById('fecha').value = yyyy+'-'+mm+'-'+dd;
   document.getElementById('summary-content').innerHTML = '';
   pdfDriveUrl = '';
-  // Reset estados
+
+  // Reset estados de los dos botones nuevos
+  var btnDrive = document.getElementById('btn-guardar-drive');
+  btnDrive.disabled = false;
+  btnDrive.textContent = '💾 Guardar expediente en Drive';
+  btnDrive.style.background = '';
+  document.getElementById('drive-status-wrap').style.display = 'none';
   var ds = document.getElementById('drive-status');
   ds.className = 'drive-status pending'; ds.textContent = '📂 Subiendo a Google Drive…';
+
+  var btnWa = document.getElementById('btn-enviar-wa');
+  btnWa.disabled = true;
+  btnWa.textContent = '💬 Enviar por WhatsApp';
+  document.getElementById('wa-status-wrap').style.display = 'none';
   var ws = document.getElementById('wa-status');
-  ws.className = 'drive-status pending'; ws.textContent = '📱 Enviando WhatsApp…';
-  document.getElementById('estados-envio').style.display = 'none';
-  var bf = document.getElementById('btn-finalizar');
-  bf.style.display = ''; bf.disabled = false; bf.textContent = '✅ Finalizar y enviar expediente';
+  ws.className = 'drive-status pending'; ws.textContent = '📱 WhatsApp Web abierto en otra pestaña';
+
   document.getElementById('btn-nuevo').style.display = 'none';
 
   goTo(0);
