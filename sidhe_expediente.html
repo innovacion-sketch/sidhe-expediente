@@ -103,10 +103,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .valoracion-grid{display:grid;grid-template-columns:1fr;gap:8px}
 .val-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .val-name{font-size:13px;font-weight:500;color:var(--text);min-width:80px}
+.val-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;flex:1}
 .val-btns{display:flex;gap:6px;flex-wrap:wrap}
 .val-btn{padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all 0.15s;font-family:'DM Sans',sans-serif}
 .val-btn.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
 .val-btn.on.neutro{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.lat-btns{display:flex;gap:6px;flex-wrap:wrap;padding-left:8px;border-left:1px solid var(--border)}
+.lat-btn{padding:5px 12px;border-radius:6px;border:1px dashed var(--border2);background:white;cursor:pointer;font-size:11px;font-weight:500;color:var(--text3);transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.lat-btn.on{background:#FFF5E5;border-color:#E0A458;border-style:solid;color:#A06820}
+
+/* ── TIPO DE ORDEN ──────────────────────────────────────────── */
+.orden-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.orden-btn{padding:8px 14px;border-radius:8px;border:1.5px solid transparent;cursor:pointer;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;transition:all 0.15s;opacity:0.55;flex:1 1 auto;min-width:110px;text-align:center}
+.orden-btn:hover{opacity:0.85}
+.orden-btn.on{opacity:1;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,0.12)}
+.orden-1era    {background:#D9E4F2;color:#1B3A4B}
+.orden-2da     {background:#1B4F8C;color:#fff}
+.orden-promo   {background:#FFF3B0;color:#7A5C00}
+.orden-garantia{background:#E5E5E5;color:#444}
+.orden-ascenso {background:#D9F2D6;color:#2D6A4F}
+.orden-segui   {background:#2D6A4F;color:#fff}
+.orden-plan1   {background:#FBD8D8;color:#A4262C}
+.orden-plan2   {background:#A4262C;color:#fff}
 
 /* ── TEXTAREA ───────────────────────────────────────────────── */
 .field textarea{font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);transition:border 0.2s,background 0.2s,box-shadow 0.2s;outline:none;resize:vertical;min-height:90px;line-height:1.5}
@@ -151,6 +169,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-wa:hover{background:#1FB855}
 
 /* ── TICKET ─────────────────────────────────────────────────── */
+.ticket-tabs{display:flex;gap:6px;margin-top:1rem;border-bottom:1px solid var(--border)}
+.ticket-tab{flex:1;padding:10px 12px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text3);transition:all 0.15s}
+.ticket-tab:hover{color:var(--text)}
+.ticket-tab.active{color:var(--accent);border-bottom-color:var(--accent2);font-weight:600}
 .ticket-zone{margin-top:1rem;padding:24px;border:2px dashed var(--border2);border-radius:var(--radius-lg);background:var(--surface2);text-align:center;min-height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column}
 .ticket-zone.has-photo{border-style:solid;background:white;padding:14px}
 .ticket-icon{font-size:54px;line-height:1;margin-bottom:14px;opacity:0.6}
@@ -402,13 +424,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="sdiv"><span>Antecedentes clínicos</span></div>
   <div class="form-grid cols1">
-    <div class="field"><label>Antecedentes médicos</label><input id="antecedentes" placeholder="p. ej. diabetes, hipertensión, artritis..."/></div>
+    <div class="field"><label>Antecedentes personales patológicos</label><input id="antecedentes" placeholder="p. ej. diabetes, hipertensión, artritis..."/></div>
   </div>
   <div class="form-grid cols1">
     <div class="field"><label>Cirugías previas</label><input id="cirugias" placeholder="p. ej. cirugía de juanete en pie derecho (2020)"/></div>
   </div>
   <div class="form-grid cols2">
-    <div class="field"><label>¿Ha tenido fracturas? <span style="color:var(--red)">*</span></label>
+    <div class="field"><label>¿Lesiones previas? <span style="color:var(--red)">*</span></label>
       <select id="fracturas-bool" onchange="toggleFracturas()">
         <option value="">Seleccionar...</option>
         <option value="No">No</option>
@@ -417,12 +439,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span class="err-msg">Campo obligatorio</span>
     </div>
     <div class="field" id="fracturas-detalle-wrap" style="display:none">
-      <label>Detalle de fracturas</label>
-      <input id="fracturas-detalle" placeholder="Zona, año, lado..."/>
+      <label>Detalle de lesiones</label>
+      <input id="fracturas-detalle" placeholder="Tipo, zona, año, lado..."/>
     </div>
   </div>
   <div class="form-grid cols1">
-    <div class="field"><label>Tipo de pisada (si la observan)</label><input id="pisada" placeholder="p. ej. pronadora, supinadora, neutra..."/></div>
+    <div class="field"><label>Tipo de marcha (si la observan)</label><input id="pisada" placeholder="p. ej. pronadora, supinadora, neutra..."/></div>
   </div>
 
   <div class="sdiv"><span>Motivo de visita</span></div>
@@ -452,26 +474,47 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="valoracion-grid" id="valoracion-grupo">
     <div class="val-card">
       <span class="val-name">Rodillas</span>
-      <div class="val-btns">
-        <button class="val-btn" onclick="setValoracion(this,'rodillas','Varo de rodillas')">Varo</button>
-        <button class="val-btn" onclick="setValoracion(this,'rodillas','Valgo de rodillas')">Valgo</button>
-        <button class="val-btn" onclick="setValoracion(this,'rodillas','Rodillas neutras')">Neutro</button>
+      <div class="val-row">
+        <div class="val-btns" data-categoria="rodillas">
+          <button class="val-btn" onclick="setValoracion(this,'rodillas','Varo')">Varo</button>
+          <button class="val-btn" onclick="setValoracion(this,'rodillas','Valgo')">Valgo</button>
+          <button class="val-btn" onclick="setValoracion(this,'rodillas','Neutro')">Neutro</button>
+        </div>
+        <div class="lat-btns" data-categoria="rodillas" style="display:none">
+          <button class="lat-btn" onclick="setLateralidad(this,'rodillas','Izq')">Izq</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'rodillas','Der')">Der</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'rodillas','Bilateral')">Bilateral</button>
+        </div>
       </div>
     </div>
     <div class="val-card">
       <span class="val-name">Retropié</span>
-      <div class="val-btns">
-        <button class="val-btn" onclick="setValoracion(this,'retropie','Varo del retropié')">Varo</button>
-        <button class="val-btn" onclick="setValoracion(this,'retropie','Valgo del retropié')">Valgo</button>
-        <button class="val-btn" onclick="setValoracion(this,'retropie','Retropié neutro')">Neutro</button>
+      <div class="val-row">
+        <div class="val-btns" data-categoria="retropie">
+          <button class="val-btn" onclick="setValoracion(this,'retropie','Varo')">Varo</button>
+          <button class="val-btn" onclick="setValoracion(this,'retropie','Valgo')">Valgo</button>
+          <button class="val-btn" onclick="setValoracion(this,'retropie','Neutro')">Neutro</button>
+        </div>
+        <div class="lat-btns" data-categoria="retropie" style="display:none">
+          <button class="lat-btn" onclick="setLateralidad(this,'retropie','Izq')">Izq</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'retropie','Der')">Der</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'retropie','Bilateral')">Bilateral</button>
+        </div>
       </div>
     </div>
     <div class="val-card">
       <span class="val-name">Pisada</span>
-      <div class="val-btns">
-        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Pronación')">Pronación</button>
-        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Supinación')">Supinación</button>
-        <button class="val-btn" onclick="setValoracion(this,'pisada-val','Pisada neutra')">Neutro</button>
+      <div class="val-row">
+        <div class="val-btns" data-categoria="pisada-val">
+          <button class="val-btn" onclick="setValoracion(this,'pisada-val','Pronación')">Pronación</button>
+          <button class="val-btn" onclick="setValoracion(this,'pisada-val','Supinación')">Supinación</button>
+          <button class="val-btn" onclick="setValoracion(this,'pisada-val','Neutro')">Neutro</button>
+        </div>
+        <div class="lat-btns" data-categoria="pisada-val" style="display:none">
+          <button class="lat-btn" onclick="setLateralidad(this,'pisada-val','Izq')">Izq</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'pisada-val','Der')">Der</button>
+          <button class="lat-btn" onclick="setLateralidad(this,'pisada-val','Bilateral')">Bilateral</button>
+        </div>
       </div>
     </div>
   </div>
@@ -490,8 +533,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <option value="Estrecha">Estrecha</option>
         <option value="3/4">3/4</option>
         <option value="Deportiva">Deportiva</option>
+        <option value="Sandalia">Sandalia</option>
+        <option value="AT Clásica iOS">AT Clásica iOS</option>
+        <option value="AT Clásica Android">AT Clásica Android</option>
+        <option value="AT Estrecha iOS">AT Estrecha iOS</option>
+        <option value="AT Estrecha Android">AT Estrecha Android</option>
       </select>
       <span class="err-msg">Campo obligatorio</span>
+    </div>
+  </div>
+  <div class="form-grid cols1" style="margin-top:8px">
+    <div class="field"><label>Tipo de orden <span style="color:var(--red)">*</span></label>
+      <div class="orden-grid" id="orden-grid">
+        <button type="button" class="orden-btn orden-1era"      data-val="1ERA ORDEN"         onclick="setOrden(this)">1ERA ORDEN</button>
+        <button type="button" class="orden-btn orden-2da"       data-val="2DA VISITA"          onclick="setOrden(this)">2DA VISITA</button>
+        <button type="button" class="orden-btn orden-promo"     data-val="PROMO"               onclick="setOrden(this)">PROMO</button>
+        <button type="button" class="orden-btn orden-garantia"  data-val="GARANTIA"            onclick="setOrden(this)">GARANTIA</button>
+        <button type="button" class="orden-btn orden-ascenso"   data-val="ASCENSO PLAN"        onclick="setOrden(this)">ASCENSO PLAN</button>
+        <button type="button" class="orden-btn orden-segui"     data-val="SEGUIMIENTO"         onclick="setOrden(this)">SEGUIMIENTO</button>
+        <button type="button" class="orden-btn orden-plan1"     data-val="PLAN ORTESICO 1A ORDEN" onclick="setOrden(this)">PLAN ORTESICO 1A ORDEN</button>
+        <button type="button" class="orden-btn orden-plan2"     data-val="PLAN ORTESICO 2A ORDEN" onclick="setOrden(this)">PLAN ORTESICO 2A ORDEN</button>
+      </div>
+      <input type="hidden" id="orden-tipo" value=""/>
+      <span class="err-msg">Selecciona un tipo de orden</span>
     </div>
   </div>
 
@@ -608,30 +672,52 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 ═════════════════════════════════════════════════════════════ -->
 <div class="panel" id="panel4">
 <div class="card">
-  <h2>Foto del ticket de compra</h2>
-  <p class="muted">Toma una foto clara del ticket. Se anexará al final del expediente PDF.</p>
+  <h2>Ticket de compra</h2>
+  <p class="muted">Toma una foto del ticket o, si fue digital, captura el código. Al menos uno es obligatorio.</p>
 
-  <div class="ticket-zone" id="ticket-zone">
-    <!-- Estado vacío -->
-    <div id="ticket-empty">
-      <div class="ticket-icon">📷</div>
-      <p class="ticket-hint">No se ha capturado ninguna foto</p>
-      <label for="ticket-input" class="btn btn-primary ticket-btn">📸 Tomar / elegir foto</label>
-      <input id="ticket-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
+  <!-- Tabs Foto / Código -->
+  <div class="ticket-tabs">
+    <button type="button" class="ticket-tab active" id="tab-foto" onclick="switchTicketTab('foto')">📷 Foto del ticket</button>
+    <button type="button" class="ticket-tab" id="tab-codigo" onclick="switchTicketTab('codigo')">🔢 Código (ticket digital)</button>
+  </div>
+
+  <!-- TAB FOTO -->
+  <div class="ticket-pane" id="pane-foto">
+    <div class="ticket-zone" id="ticket-zone">
+      <!-- Estado vacío -->
+      <div id="ticket-empty">
+        <div class="ticket-icon">📷</div>
+        <p class="ticket-hint">No se ha capturado ninguna foto</p>
+        <label for="ticket-input" class="btn btn-primary ticket-btn">📸 Tomar / elegir foto</label>
+        <input id="ticket-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
+      </div>
+      <!-- Vista previa (se muestra tras seleccionar) -->
+      <div id="ticket-preview-wrap" style="display:none">
+        <img id="ticket-preview" alt="Ticket" />
+        <div class="ticket-actions">
+          <label for="ticket-input-2" class="btn">🔄 Retomar foto</label>
+          <input id="ticket-input-2" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
+          <button class="btn btn-danger" onclick="removeTicket()">✕ Quitar</button>
+        </div>
+      </div>
     </div>
-    <!-- Vista previa (se muestra tras seleccionar) -->
-    <div id="ticket-preview-wrap" style="display:none">
-      <img id="ticket-preview" alt="Ticket" />
-      <div class="ticket-actions">
-        <label for="ticket-input-2" class="btn">🔄 Retomar foto</label>
-        <input id="ticket-input-2" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
-        <button class="btn btn-danger" onclick="removeTicket()">✕ Quitar</button>
+  </div>
+
+  <!-- TAB CÓDIGO -->
+  <div class="ticket-pane" id="pane-codigo" style="display:none">
+    <div class="ticket-zone" style="min-height:200px">
+      <div style="width:100%;max-width:480px">
+        <label class="muted" style="font-size:13px;display:block;margin-bottom:8px;text-align:left">Código del ticket digital</label>
+        <input id="ticket-codigo" placeholder="Ej: 4587-2389-1106" style="width:100%;font-size:18px;letter-spacing:1px;text-align:center;padding:14px;border:1px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;background:white"/>
+        <p class="muted" style="font-size:12px;margin-top:10px;text-align:center">
+          Tal como aparece en el comprobante digital del cliente.
+        </p>
       </div>
     </div>
   </div>
 
   <p class="muted" style="margin-top:12px;font-size:12px">
-    
+    💡 La información se guarda solo en tu dispositivo hasta que finalices el expediente.
   </p>
 
   <div class="nav-row">
@@ -669,7 +755,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       💬 Enviar por WhatsApp
     </button>
     <p class="muted" style="font-size:12px;margin-top:8px;text-align:center">
-      
+      Se abrirá WhatsApp Web. Si ya iniciaste sesión, no pedirá QR.
     </p>
 
     <!-- Estado WhatsApp -->
@@ -709,6 +795,19 @@ var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','
 document.getElementById('fecha-display').textContent = dd + ' ' + meses[today.getMonth()] + ' ' + yyyy;
 document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
 
+// Fecha de entrega = hoy + 15 días
+function calcularFechaEntrega() {
+  var f = document.getElementById('fecha').value;
+  var base = f ? new Date(f + 'T12:00:00') : new Date();
+  base.setDate(base.getDate() + 15);
+  var dd2 = String(base.getDate()).padStart(2,'0');
+  var mm2 = String(base.getMonth()+1).padStart(2,'0');
+  document.getElementById('entrega').value = base.getFullYear() + '-' + mm2 + '-' + dd2;
+}
+calcularFechaEntrega();
+// Recalcular si el especialista cambia la fecha de consulta
+document.getElementById('fecha').addEventListener('change', calcularFechaEntrega);
+
 // Modal sucursal
 function setSucursal() {
   var sel = document.getElementById('select-sucursal').value;
@@ -743,6 +842,7 @@ var panelValidations = {
       { id:'tipo-calzado', check: function(v){ return v.trim().length > 0; } },
       { id:'num-plantilla',check: function(v){ return v.trim().length > 0; } },
       { id:'horma',        check: function(v){ return v.trim().length > 0; } },
+      { id:'orden-tipo',   check: function(v){ return v.trim().length > 0; } },
     ];
     // motivo: al menos uno marcado o campo "otro" llenado
     var motivosChecked = document.querySelectorAll('#motivos input:checked').length > 0;
@@ -780,8 +880,9 @@ var panelValidations = {
     return true;
   },
   4: function() {
-    if (!ticketImageData) {
-      showToast('📷 Toma la foto del ticket antes de continuar');
+    var codigo = document.getElementById('ticket-codigo').value.trim();
+    if (!ticketImageData && !codigo) {
+      showToast('📷 Captura una foto del ticket o ingresa el código digital');
       return false;
     }
     return true;
@@ -880,24 +981,87 @@ function toggleFracturas() {
   if (sel !== 'Sí') document.getElementById('fracturas-detalle').value = '';
 }
 
-// Valoración: solo una opción por categoría (varo/valgo/neutro)
+// Valoración: hallazgo (varo/valgo/neutro o pron/sup/neutro) + lateralidad (izq/der/bilat)
+// Estructura: valoracionSelected = { rodillas: {hallazgo:'Varo', lat:'Izq'}, ... }
 function setValoracion(btn, categoria, label) {
-  var card = btn.parentElement;
+  var card = btn.closest('.val-card');
   var ya = btn.classList.contains('on');
-  // Limpiar todos los botones de esta categoría
+  // Limpiar todos los botones de hallazgo de esta categoría
   card.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
+  var latBox = card.querySelector('.lat-btns');
   if (ya) {
-    // Si ya estaba seleccionado, deseleccionar
+    // Si ya estaba seleccionado, deseleccionar y ocultar lateralidad
     delete valoracionSelected[categoria];
+    latBox.style.display = 'none';
+    latBox.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
   } else {
     btn.classList.add('on');
-    // Marcar visualmente diferente si es Neutro
     if (label.toLowerCase().indexOf('neutr') !== -1) btn.classList.add('neutro');
-    valoracionSelected[categoria] = label;
+    // Guardar el hallazgo (manteniendo lat si ya existía)
+    var prev = valoracionSelected[categoria] || {};
+    valoracionSelected[categoria] = { hallazgo: label, lat: prev.lat || '' };
+    // Mostrar selector de lateralidad
+    latBox.style.display = '';
   }
 }
 
+function setLateralidad(btn, categoria, label) {
+  var card = btn.closest('.val-card');
+  var ya = btn.classList.contains('on');
+  card.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
+  if (!valoracionSelected[categoria]) return; // no debería pasar
+  if (ya) {
+    valoracionSelected[categoria].lat = '';
+  } else {
+    btn.classList.add('on');
+    valoracionSelected[categoria].lat = label;
+  }
+}
+
+// Tipo de orden: solo una opción
+function setOrden(btn) {
+  var grid = document.getElementById('orden-grid');
+  var ya = btn.classList.contains('on');
+  grid.querySelectorAll('.orden-btn').forEach(function(b){ b.classList.remove('on'); });
+  var hidden = document.getElementById('orden-tipo');
+  if (ya) {
+    hidden.value = '';
+  } else {
+    btn.classList.add('on');
+    hidden.value = btn.getAttribute('data-val');
+    hidden.classList.remove('error');
+  }
+}
+
+// Helper para volcar valoracionSelected como array de strings legibles
+function valoracionToArray() {
+  var labels = { rodillas: 'Rodillas', retropie: 'Retropié', 'pisada-val': 'Pisada' };
+  var out = [];
+  Object.keys(valoracionSelected).forEach(function(k){
+    var v = valoracionSelected[k];
+    if (!v || !v.hallazgo) return;
+    var s = labels[k] + ': ' + v.hallazgo;
+    if (v.lat) s += ' (' + v.lat + ')';
+    out.push(s);
+  });
+  return out;
+}
+
 // ── TICKET ────────────────────────────────────────────────────
+function switchTicketTab(tab) {
+  var tFoto = document.getElementById('tab-foto');
+  var tCod  = document.getElementById('tab-codigo');
+  var pFoto = document.getElementById('pane-foto');
+  var pCod  = document.getElementById('pane-codigo');
+  if (tab === 'foto') {
+    tFoto.classList.add('active'); tCod.classList.remove('active');
+    pFoto.style.display = ''; pCod.style.display = 'none';
+  } else {
+    tCod.classList.add('active'); tFoto.classList.remove('active');
+    pCod.style.display = ''; pFoto.style.display = 'none';
+  }
+}
+
 function onTicketSelected(ev) {
   var file = ev.target.files && ev.target.files[0];
   if (!file) return;
@@ -1178,7 +1342,7 @@ function generarPDF() {
   var motivos = getChecked('motivos');
   var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
   // Construir array de valoración a partir de valoracionSelected + campo libre
-  var valoracion = Object.values(valoracionSelected || {});
+  var valoracion = valoracionToArray();
   var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
 
   // Construir dolor con campo libre
@@ -1207,10 +1371,10 @@ function generarPDF() {
   row('Sucursal', sucursalActual, true);
 
   Y += 2; section('ANTECEDENTES CLÍNICOS');
-  row('Antecedentes médicos', v('antecedentes'), false);
+  row('Antecedentes patológicos', v('antecedentes'), false);
   row('Cirugías previas', v('cirugias'), true);
-  row('Fracturas', fractText, false);
-  row('Tipo de pisada', v('pisada'), true);
+  row('Lesiones previas', fractText, false);
+  row('Tipo de marcha', v('pisada'), true);
 
   Y += 2; section('MOTIVO DE VISITA');
   row('Motivos', motivos.join(' | ') || 'No especificado', false);
@@ -1224,7 +1388,7 @@ function generarPDF() {
   Y += 2; section('DATOS DE PLANTILLA');
   row2('Talla', v('talla'), 'Número', v('num-plantilla'), false);
   row2('Tipo de calzado', v('tipo-calzado'), 'Horma', v('horma'), true);
-  row('Fecha de entrega estimada', v('entrega'), false);
+  row2('Tipo de orden', v('orden-tipo'), 'Fecha de entrega', v('entrega'), false);
 
   // Observaciones (solo si hay contenido)
   var obs = v('observaciones');
@@ -1255,7 +1419,10 @@ function generarPDF() {
   doc.setFont('helvetica','normal'); doc.setFontSize(7);
   doc.setTextColor(C_GREEN[0],C_GREEN[1],C_GREEN[2]);
   var docsLine = '✓  Consentimiento informado    ✓  Instrucciones de uso y cuidado    ✓  Aviso de privacidad';
-  if (ticketImageData) docsLine += '    ✓  Ticket de compra';
+  var ticketCodPrev = v('ticket-codigo');
+  if (ticketImageData && ticketCodPrev !== '—') docsLine += '    ✓  Ticket (foto + código)';
+  else if (ticketImageData)                    docsLine += '    ✓  Ticket (foto)';
+  else if (ticketCodPrev !== '—')              docsLine += '    ✓  Ticket (código digital)';
   doc.text(docsLine, ML+5, Y+14);
   Y += 25;
 
@@ -1400,30 +1567,47 @@ function generarPDF() {
   // ════════════════════════════════════════════════════════════
   // PÁGINA 5 — TICKET DE COMPRA
   // ════════════════════════════════════════════════════════════
-  if (ticketImageData) {
+  var ticketCodigo = v('ticket-codigo');
+  if (ticketImageData || (ticketCodigo && ticketCodigo !== '—')) {
     doc.addPage(); currentDocTitle = 'Ticket de Compra'; currentPage = 5;
     drawHeader(currentDocTitle, currentPage);
     section('TICKET DE COMPRA');
-    try {
-      // Dimensionar manteniendo proporción dentro del área disponible
-      var img = new Image(); img.src = ticketImageData;
-      // Si la imagen ya cargó (preview reciente) usamos sus dims; si no, usamos defaults razonables
-      var iw = img.width || 1200, ih = img.height || 1600;
-      var maxW = CW;                    // ancho útil
-      var maxH = 286 - Y - 14;          // alto útil hasta antes del footer
-      var ratio = Math.min(maxW/iw, maxH/ih);
-      var pw = iw * ratio, ph = ih * ratio;
-      var px = ML + (CW - pw) / 2;      // centrado horizontal
-      doc.addImage(ticketImageData, 'JPEG', px, Y, pw, ph);
-      Y += ph + 4;
-      // Pie con la fecha
-      doc.setFont('helvetica','italic'); doc.setFontSize(8);
-      doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-      doc.text('Ticket capturado el ' + v('fecha') + ' — ' + sucursalActual, W/2, Y+3, {align:'center'});
-    } catch(e) {
-      doc.setFont('helvetica','normal'); doc.setFontSize(9);
-      doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-      doc.text('No se pudo insertar la imagen del ticket.', ML, Y);
+
+    // Si hay código, mostrarlo en un recuadro destacado
+    if (ticketCodigo && ticketCodigo !== '—') {
+      doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
+      doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(ML, Y, CW, 14, 2, 2, 'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+      doc.text('Código del ticket digital:', ML+5, Y+5);
+      doc.setFont('courier','bold'); doc.setFontSize(13);
+      doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+      doc.text(ticketCodigo, ML+5, Y+11);
+      Y += 18;
+    }
+
+    // Si hay foto, ponerla
+    if (ticketImageData) {
+      try {
+        var img = new Image(); img.src = ticketImageData;
+        var iw = img.width || 1200, ih = img.height || 1600;
+        var maxW = CW;
+        var maxH = 286 - Y - 14;
+        var ratio = Math.min(maxW/iw, maxH/ih);
+        var pw = iw * ratio, ph = ih * ratio;
+        var px = ML + (CW - pw) / 2;
+        doc.addImage(ticketImageData, 'JPEG', px, Y, pw, ph);
+        Y += ph + 4;
+        doc.setFont('helvetica','italic'); doc.setFontSize(8);
+        doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+        doc.text('Ticket capturado el ' + v('fecha') + ' — ' + sucursalActual, W/2, Y+3, {align:'center'});
+      } catch(e) {
+        doc.setFont('helvetica','normal'); doc.setFontSize(9);
+        doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+        doc.text('No se pudo insertar la imagen del ticket.', ML, Y);
+      }
     }
   }
 
@@ -1462,7 +1646,7 @@ async function guardarEnDrive() {
 
     var motivos    = getChecked('motivos');
     var otroMotivo = v('otro-motivo'); if(otroMotivo !== '—') motivos.push(otroMotivo);
-    var valoracion = Object.values(valoracionSelected || {});
+    var valoracion = valoracionToArray();
     var otroVal    = v('otro-valoracion'); if(otroVal !== '—') valoracion.push(otroVal);
     var dolorList  = dolorSelected.slice();
     var otroDolor  = v('otro-dolor'); if(otroDolor !== '—') dolorList.push(otroDolor);
@@ -1502,6 +1686,8 @@ async function guardarEnDrive() {
       calzado:       v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado'),
       num_plantilla: v('num-plantilla'),
       horma:         v('horma'),
+      orden_tipo:    v('orden-tipo'),
+      ticket_codigo: v('ticket-codigo'),
       entrega:       v('entrega'),
     };
 
@@ -1575,7 +1761,7 @@ function enviarPorWhatsapp() {
 function buildSummary() {
   var motivos = getChecked('motivos');
   var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  var val = Object.values(valoracionSelected || {});
+  var val = valoracionToArray();
   var otroVal = v('otro-valoracion'); if(otroVal!=='—') val.push(otroVal);
   var dolorList = dolorSelected.slice();
   var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
@@ -1593,10 +1779,10 @@ function buildSummary() {
   h += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
   h += '</div>';
   h += '<div class="sum-card"><h4>Antecedentes clínicos</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Antecedentes médicos</span><span class="sum-val">'+v('antecedentes')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Antecedentes pers. patológicos</span><span class="sum-val">'+v('antecedentes')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Cirugías previas</span><span class="sum-val">'+v('cirugias')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Fracturas</span><span class="sum-val">'+fractText+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Tipo de pisada</span><span class="sum-val">'+v('pisada')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Lesiones previas</span><span class="sum-val">'+fractText+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Tipo de marcha</span><span class="sum-val">'+v('pisada')+'</span></div>';
   h += '</div>';
   h += '<div class="sum-card"><h4>Evaluación clínica</h4>';
   h += '<div class="sum-row"><span class="sum-key">Motivo</span><span class="sum-val">'+(motivos.length?motivos.join(', '):'No especificado')+'</span></div>';
@@ -1608,6 +1794,7 @@ function buildSummary() {
   h += '<div class="sum-row"><span class="sum-key">Calzado</span><span class="sum-val">'+(v('calzado-cons')!=='—'?v('calzado-cons'):v('tipo-calzado'))+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Número</span><span class="sum-val">'+v('num-plantilla')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Horma</span><span class="sum-val">'+v('horma')+'</span></div>';
+  h += '<div class="sum-row"><span class="sum-key">Tipo de orden</span><span class="sum-val">'+v('orden-tipo')+'</span></div>';
   h += '<div class="sum-row"><span class="sum-key">Entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
   h += '</div>';
   // Observaciones (solo si hay)
@@ -1617,10 +1804,16 @@ function buildSummary() {
     h += '<div class="sum-row" style="display:block"><span class="sum-val" style="white-space:pre-wrap">'+obs+'</span></div>';
     h += '</div>';
   }
-  // Ticket de compra
-  if (ticketImageData) {
+  // Ticket de compra (foto y/o código)
+  var tCod = v('ticket-codigo');
+  if (ticketImageData || tCod !== '—') {
     h += '<div class="sum-card"><h4>Ticket de compra</h4>';
-    h += '<div style="text-align:center;margin-top:8px"><img src="'+ticketImageData+'" alt="Ticket" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border)"/></div>';
+    if (tCod !== '—') {
+      h += '<div class="sum-row"><span class="sum-key">Código digital</span><span class="sum-val" style="font-family:monospace;letter-spacing:1px">'+tCod+'</span></div>';
+    }
+    if (ticketImageData) {
+      h += '<div style="text-align:center;margin-top:8px"><img src="'+ticketImageData+'" alt="Ticket" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border)"/></div>';
+    }
     h += '</div>';
   }
   h += '<div class="sum-card" style="background:var(--green-bg);border-color:var(--green-border)"><h4 style="color:var(--green)">Documentos firmados</h4>';
@@ -1641,6 +1834,10 @@ function resetAll() {
   document.querySelectorAll('.check-item').forEach(function(i){ i.classList.remove('checked'); });
   document.querySelectorAll('.side-btn').forEach(function(b){ b.classList.remove('on'); });
   document.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
+  document.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.lat-btns').forEach(function(b){ b.style.display = 'none'; });
+  document.querySelectorAll('.orden-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('orden-tipo').value = '';
   dolorSelected = [];
   valoracionSelected = {};
   // Ocultar detalle de fracturas
@@ -1652,6 +1849,7 @@ function resetAll() {
     var h=document.getElementById('hint-'+id.replace('canvas-','')); if(h) h.style.opacity='1';
   });
   document.getElementById('fecha').value = yyyy+'-'+mm+'-'+dd;
+  calcularFechaEntrega();
   document.getElementById('summary-content').innerHTML = '';
   pdfDriveUrl = '';
 
