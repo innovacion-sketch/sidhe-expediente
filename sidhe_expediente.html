@@ -114,17 +114,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* ── TIPO DE ORDEN ──────────────────────────────────────────── */
 .orden-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.orden-btn{padding:8px 14px;border-radius:8px;border:1.5px solid transparent;cursor:pointer;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;transition:all 0.15s;opacity:0.55;flex:1 1 auto;min-width:110px;text-align:center}
-.orden-btn:hover{opacity:0.85}
-.orden-btn.on{opacity:1;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,0.12)}
-.orden-1era    {background:#D9E4F2;color:#1B3A4B}
-.orden-2da     {background:#1B4F8C;color:#fff}
-.orden-promo   {background:#FFF3B0;color:#7A5C00}
-.orden-garantia{background:#E5E5E5;color:#444}
-.orden-ascenso {background:#D9F2D6;color:#2D6A4F}
-.orden-segui   {background:#2D6A4F;color:#fff}
-.orden-plan1   {background:#FBD8D8;color:#A4262C}
-.orden-plan2   {background:#A4262C;color:#fff}
+.orden-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;transition:all 0.15s;background:var(--surface2);color:var(--text2);flex:1 1 auto;min-width:110px;text-align:center}
+.orden-btn:hover{background:white;border-color:var(--border2);color:var(--text)}
+.orden-btn.on{background:var(--accent);border-color:var(--accent);color:white;box-shadow:0 3px 8px rgba(27,58,75,0.2)}
 
 /* ── TEXTAREA ───────────────────────────────────────────────── */
 .field textarea{font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);color:var(--text);transition:border 0.2s,background 0.2s,box-shadow 0.2s;outline:none;resize:vertical;min-height:90px;line-height:1.5}
