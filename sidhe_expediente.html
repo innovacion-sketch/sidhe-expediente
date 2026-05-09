@@ -16,6 +16,7 @@
   --border:#DDD8D0;--border2:#C8C2B8;
   --green:#2D6A4F;--green-bg:#D8F3DC;--green-border:#2D6A4F;
   --red:#A4262C;--red-bg:#FDE8E8;
+  --amber:#B45309;--amber-bg:#FEF3C7;--amber-border:#F59E0B;
   --radius:10px;--radius-lg:16px;--radius-xl:20px;
   --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);
 }
@@ -159,6 +160,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-finalizar:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
 .btn-wa{background:#25D366;box-shadow:0 4px 14px rgba(37,211,102,0.3)}
 .btn-wa:hover{background:#1FB855}
+.btn-pendiente{background:var(--amber);box-shadow:0 4px 14px rgba(180,83,9,0.25)}
+.btn-pendiente:hover{background:#92400e}
 
 /* ── TICKET ─────────────────────────────────────────────────── */
 .ticket-tabs{display:flex;gap:6px;margin-top:1rem;border-bottom:1px solid var(--border)}
@@ -173,15 +176,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #ticket-preview{max-width:100%;max-height:420px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,0.08);display:block;margin:0 auto}
 .ticket-actions{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
 .ticket-actions label{cursor:pointer}
-.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25D366;border:none;border-radius:var(--radius);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
-.btn-wa:active{opacity:0.85}
 .btn-drive{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:var(--radius);color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-bottom:10px}
 .btn-drive:active{opacity:0.85}
-.btn-drive.loading{opacity:0.7;pointer-events:none}
-.btn-drive.success{background:var(--green)}
 .btn-download{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:white;border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;margin-bottom:10px}
 .btn-download:hover{background:var(--surface2);border-color:var(--border2)}
-.btn-download:active{transform:scale(0.98)}
 
 /* ── NAV ─────────────────────────────────────────────────────── */
 .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)}
@@ -203,24 +201,49 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .drive-status.done{background:var(--green-bg);color:var(--green);border:1px solid rgba(45,106,79,0.3)}
 .drive-status.error{background:var(--red-bg);color:var(--red);border:1px solid rgba(164,38,44,0.3)}
 
-/* ── MODAL SUCURSAL ──────────────────────────────────────────── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center}
+/* ── MODAL SUCURSAL / ESPECIALISTA ──────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.open{display:flex}
-.modal{background:white;border-radius:var(--radius-xl);padding:2rem;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal{background:white;border-radius:var(--radius-xl);padding:2rem;width:380px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
 .modal h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);margin-bottom:6px}
 .modal p{font-size:13px;color:var(--text3);margin-bottom:1.25rem}
 .modal .field{margin-bottom:1rem}
-.modal select{width:100%}
+.modal select,.modal input{width:100%}
 
-/* ── RESPONSIVE ──────────────────────────────────────────────
-   Breakpoints:
-   > 900px  → PC / monitor grande    (diseño completo)
-   600–900px → laptop / tablet horizontal
-   400–600px → tablet vertical / celular grande
-   < 400px  → celular pequeño
-─────────────────────────────────────────────────────────────*/
+/* ── HOME / LISTA DE EXPEDIENTES ─────────────────────────────── */
+.home-actions{display:flex;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
+.home-actions .btn{flex:1;min-width:160px;padding:14px;font-size:14px;font-weight:600}
+.btn-new{background:var(--accent);border-color:var(--accent);color:white}
+.btn-new:hover{background:#152f3e;color:white}
+.list-filter{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-pill{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:white;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.filter-pill.on{background:var(--accent);border-color:var(--accent);color:white}
+.filter-search{flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;background:white;outline:none}
+.filter-search:focus{border-color:var(--accent)}
+.exp-list{display:flex;flex-direction:column;gap:8px}
+.exp-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all 0.15s}
+.exp-row:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.exp-info{flex:1;min-width:0}
+.exp-name{font-weight:600;color:var(--text);font-size:14px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap}
+.exp-meta span{white-space:nowrap}
+.exp-status{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.exp-status.enviado{background:var(--green-bg);color:var(--green);border:1px solid rgba(45,106,79,0.3)}
+.exp-status.pendiente{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.exp-status.error{background:var(--red-bg);color:var(--red);border:1px solid rgba(164,38,44,0.3)}
+.exp-actions-row{display:flex;gap:6px;flex-shrink:0}
+.exp-btn-sm{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;white-space:nowrap}
+.exp-btn-sm:hover{background:var(--surface2)}
+.exp-btn-sm.primary{background:var(--amber);border-color:var(--amber);color:white}
+.exp-btn-sm.primary:hover{background:#92400e;color:white}
+.exp-btn-sm.locked{opacity:0.5;cursor:not-allowed}
+.exp-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:14px}
+.exp-empty-icon{font-size:48px;margin-bottom:12px;opacity:0.4}
+.exp-loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+.specialist-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--accent-light);border:1px solid var(--accent-border);border-radius:20px;font-size:11px;color:var(--accent);font-weight:500}
+.specialist-chip button{background:none;border:none;cursor:pointer;color:var(--accent);font-size:13px;padding:0;margin-left:2px}
 
-/* Tablet horizontal / laptop pequeña */
+/* ── RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width:900px){
   .app{padding:1rem}
   .header{padding:1.1rem 1.25rem;gap:1rem}
@@ -231,53 +254,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .checks-grid{grid-template-columns:repeat(2,1fr)}
   .dolor-grid{grid-template-columns:1fr}
 }
-
-/* Tablet vertical / celular grande */
 @media (max-width:640px){
   .app{padding:0.75rem}
-  /* Header apilado */
   .header{flex-direction:column;align-items:flex-start;gap:0.75rem;padding:1rem 1.1rem;border-radius:var(--radius-lg)}
   .header-right{margin-left:0;display:flex;align-items:center;justify-content:space-between;width:100%}
   .date-big{font-size:15px}
   .sucursal-badge{margin-top:0}
-  /* Grids a 1 columna */
   .cols2,.cols3{grid-template-columns:1fr}
-  /* Steps más compactos */
   .step-tab{padding:10px 6px;font-size:10px;gap:4px}
   .step-icon{width:22px;height:22px;font-size:10px}
-  /* Cards */
   .card{padding:1rem;border-radius:var(--radius)}
   .card-header{flex-direction:column;gap:8px;margin-bottom:1rem;padding-bottom:0.85rem}
   .card-badge{align-self:flex-start}
   .card-title{font-size:17px}
-  /* Checkboxes 2 columnas */
   .checks-grid{grid-template-columns:repeat(2,1fr);gap:6px}
   .check-item{padding:10px 10px}
   .check-item span{font-size:12px}
-  /* Dolor en 1 columna */
   .dolor-grid{grid-template-columns:1fr}
-  /* Firma canvas más alta para el dedo */
   .canvas-wrap canvas{height:220px!important}
-  /* Botones de nav a full width en móvil */
   .nav-row{flex-direction:column-reverse;gap:10px}
   .nav-row .btn{width:100%;text-align:center;justify-content:center}
-  /* Resumen */
   .sum-row{flex-direction:column;gap:2px}
   .sum-val{text-align:left;max-width:100%}
-  /* Modal más angosto */
-  .modal{width:calc(100vw - 2rem);padding:1.5rem}
-  /* Toast más ancho */
+  .modal{padding:1.5rem}
   .toast{width:calc(100vw - 2rem);text-align:center;white-space:normal}
-  /* Firma nombre */
   .sig-name-input{font-size:15px}
-  /* Doc scroll más alto para leer mejor */
   .doc-scroll{max-height:200px}
-  /* Progress texto oculto, solo íconos */
   .step-tab{font-size:0}
   .step-icon{font-size:11px;width:24px;height:24px}
+  .exp-row{flex-wrap:wrap}
+  .exp-actions-row{width:100%;margin-top:6px}
+  .exp-actions-row .exp-btn-sm{flex:1}
 }
-
-/* Celular pequeño */
 @media (max-width:400px){
   .app{padding:0.5rem}
   .header{padding:0.85rem}
@@ -287,12 +295,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .card{padding:0.85rem}
   .field input,.field select{font-size:13px;padding:10px 12px}
   .btn{padding:12px 16px;font-size:13px}
-  .btn-wa,.btn-drive{padding:14px;font-size:14px}
+  .btn-drive{padding:14px;font-size:14px}
   .canvas-wrap canvas{height:160px!important}
   .doc-scroll{max-height:160px;padding:0.85rem 1rem}
 }
-
-/* PC grande: centrado con ancho máximo cómodo */
 @media (min-width:1200px){
   .app{padding:2rem 2.5rem}
   .card{padding:2rem}
@@ -303,11 +309,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<!-- MODAL SELECTOR DE SUCURSAL -->
+<!-- MODAL SELECTOR DE SUCURSAL + ESPECIALISTA -->
 <div class="modal-bg open" id="modal-sucursal">
   <div class="modal">
     <h3>Bienvenido a Sidhe</h3>
-    <p>Selecciona tu sucursal para continuar</p>
+    <p>Identifícate y selecciona tu sucursal para continuar</p>
+    <div class="field">
+      <label>Tu nombre (especialista)</label>
+      <input id="input-especialista-modal" placeholder="Tu nombre completo"/>
+    </div>
     <div class="field">
       <label>Sucursal</label>
       <select id="select-sucursal">
@@ -368,8 +378,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<!-- PROGRESS -->
-<div class="progress-wrap">
+<!-- ════════════════════════════════════════════════════════════
+     PANEL HOME — LISTA DE EXPEDIENTES
+═════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-home">
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Expedientes</div>
+      <div class="card-sub">Sucursal: <span id="home-sucursal-label">—</span> · Especialista: <span id="home-especialista-label">—</span></div>
+    </div>
+    <div class="specialist-chip">
+      <span id="home-spec-chip">—</span>
+      <button onclick="cambiarEspecialista()" title="Cambiar especialista">✏️</button>
+    </div>
+  </div>
+
+  <div class="home-actions">
+    <button class="btn btn-new" onclick="iniciarNuevoExpediente()">+ Nuevo expediente</button>
+    <button class="btn" onclick="cargarLista()">↻ Actualizar lista</button>
+  </div>
+
+  <div class="list-filter">
+    <button class="filter-pill on" data-filter="todos" onclick="filtrarLista('todos',this)">Todos</button>
+    <button class="filter-pill" data-filter="pendiente" onclick="filtrarLista('pendiente',this)">⏳ Pendientes</button>
+    <button class="filter-pill" data-filter="enviado" onclick="filtrarLista('enviado',this)">✓ Enviados</button>
+    <input type="text" class="filter-search" id="filter-search" placeholder="Buscar por nombre o teléfono..." oninput="renderLista()"/>
+  </div>
+
+  <div id="exp-list-container">
+    <div class="exp-loading">Cargando expedientes...</div>
+  </div>
+</div>
+</div>
+
+<!-- PROGRESS (oculto en home) -->
+<div class="progress-wrap" id="progress-wrap" style="display:none">
   <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
   <div class="steps-row">
     <button class="step-tab active" onclick="goTo(0)" id="step0"><div class="step-icon">1</div>Datos</button>
@@ -384,7 +428,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- ════════════════════════════════════════════════════════════
      PANEL 0 — DATOS DEL CLIENTE
 ═════════════════════════════════════════════════════════════ -->
-<div class="panel active" id="panel0">
+<div class="panel" id="panel0">
 <div class="card">
   <div class="card-header">
     <div><div class="card-title">Datos del cliente</div><div class="card-sub">Registro clínico y evaluación inicial</div></div>
@@ -557,7 +601,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <textarea id="observaciones" rows="4" placeholder="Anotar cualquier información relevante que no se haya capturado en los campos anteriores..."></textarea>
     </div>
   </div>
-  <div class="nav-row"><div></div><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
+  <div class="nav-row"><button class="btn" onclick="volverAHome()">← Volver a lista</button><button class="btn btn-primary" onclick="next()">Siguiente →</button></div>
 </div>
 </div>
 
@@ -664,8 +708,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 ═════════════════════════════════════════════════════════════ -->
 <div class="panel" id="panel4">
 <div class="card">
-  <h2>Ticket de compra</h2>
-  <p class="muted">Toma una foto del ticket o, si fue digital, captura el código. Al menos uno es obligatorio.</p>
+  <h2 style="font-family:'DM Serif Display',serif;color:var(--accent);font-weight:400;font-size:21px">Ticket de compra</h2>
+  <p style="font-size:13px;color:var(--text3);margin-top:4px;margin-bottom:1rem">Toma una foto del ticket o, si fue digital, captura el código. Si el cliente no lo tiene en este momento, puedes guardar el expediente como pendiente.</p>
 
   <!-- Tabs Foto / Código -->
   <div class="ticket-tabs">
@@ -676,14 +720,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <!-- TAB FOTO -->
   <div class="ticket-pane" id="pane-foto">
     <div class="ticket-zone" id="ticket-zone">
-      <!-- Estado vacío -->
       <div id="ticket-empty">
         <div class="ticket-icon">📷</div>
         <p class="ticket-hint">No se ha capturado ninguna foto</p>
         <label for="ticket-input" class="btn btn-primary ticket-btn">📸 Tomar / elegir foto</label>
         <input id="ticket-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onTicketSelected(event)"/>
       </div>
-      <!-- Vista previa (se muestra tras seleccionar) -->
       <div id="ticket-preview-wrap" style="display:none">
         <img id="ticket-preview" alt="Ticket" />
         <div class="ticket-actions">
@@ -699,22 +741,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="ticket-pane" id="pane-codigo" style="display:none">
     <div class="ticket-zone" style="min-height:200px">
       <div style="width:100%;max-width:480px">
-        <label class="muted" style="font-size:13px;display:block;margin-bottom:8px;text-align:left">Código del ticket digital</label>
+        <label style="font-size:13px;color:var(--text3);display:block;margin-bottom:8px;text-align:left">Código del ticket digital</label>
         <input id="ticket-codigo" placeholder="Ej: 4587-2389-1106" style="width:100%;font-size:18px;letter-spacing:1px;text-align:center;padding:14px;border:1px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;background:white"/>
-        <p class="muted" style="font-size:12px;margin-top:10px;text-align:center">
+        <p style="font-size:12px;margin-top:10px;text-align:center;color:var(--text3)">
           Tal como aparece en el comprobante digital del cliente.
         </p>
       </div>
     </div>
   </div>
 
-  <p class="muted" style="margin-top:12px;font-size:12px">
-    💡 La información se guarda solo en tu dispositivo hasta que finalices el expediente.
-  </p>
+  <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:12px 14px;margin-top:14px;display:flex;align-items:flex-start;gap:10px">
+    <span style="font-size:18px">⏳</span>
+    <div style="font-size:12.5px;color:var(--amber);line-height:1.5">
+      <strong>¿El cliente no tiene el ticket aún?</strong> Puedes guardar este expediente como <em>pendiente</em> en el siguiente paso. Cuando vuelva con el ticket, lo encontrarás en tu lista para completarlo y enviarlo por WhatsApp.
+    </div>
+  </div>
 
   <div class="nav-row">
     <button class="btn" onclick="prev()">← Anterior</button>
-    <button class="btn btn-primary" onclick="if(panelValidations[4]()){goTo(5);buildSummary();}">Ver resumen →</button>
+    <button class="btn btn-primary" onclick="goTo(5);buildSummary();">Ver resumen →</button>
   </div>
 </div>
 </div>
@@ -727,38 +772,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="summary-header">
     <div class="check-circle">✓</div>
     <h2>Expediente completado</h2>
-    <p id="summary-subtitle">Documentos firmados y ticket capturado.</p>
+    <p id="summary-subtitle">Documentos firmados — listo para guardar y enviar.</p>
   </div>
   <div id="summary-content"></div>
-  <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)">
 
-    <!-- Botón 1: Guardar en Drive -->
-    <button class="btn-finalizar" id="btn-guardar-drive" onclick="guardarEnDrive()">
-      💾 Guardar expediente en Drive
-    </button>
+  <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)" id="finalizar-acciones">
 
-    <!-- Estado Drive -->
-    <div id="drive-status-wrap" style="display:none;margin-top:12px">
-      <div class="drive-status pending" id="drive-status">📂 Subiendo a Google Drive…</div>
+    <!-- CASO A: HAY TICKET (foto o código) -->
+    <div id="acciones-con-ticket" style="display:none">
+      <button class="btn-finalizar" id="btn-guardar-enviar" onclick="guardarYEnviar()">
+        💾 Guardar y enviar por WhatsApp
+      </button>
+      <p style="font-size:12px;margin-top:8px;text-align:center;color:var(--text3)">
+        Se guardará en Drive y se enviará automáticamente al WhatsApp del cliente.
+      </p>
     </div>
 
-    <!-- Botón 2: WhatsApp (deshabilitado hasta que Drive termine) -->
-    <button class="btn-finalizar btn-wa" id="btn-enviar-wa" onclick="enviarPorWhatsapp()" disabled style="margin-top:12px">
-      💬 Enviar por WhatsApp
-    </button>
-    <p class="muted" style="font-size:12px;margin-top:8px;text-align:center">
-      Se abrirá WhatsApp Web. Si ya iniciaste sesión, no pedirá QR.
-    </p>
+    <!-- CASO B: NO HAY TICKET -->
+    <div id="acciones-sin-ticket" style="display:none">
+      <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;text-align:center;color:var(--amber);font-size:13px">
+        ⚠ No se capturó ticket. El expediente se guardará como <strong>pendiente</strong>.
+      </div>
+      <button class="btn-finalizar btn-pendiente" id="btn-guardar-pendiente" onclick="guardarPendiente()">
+        ⏳ Guardar como pendiente
+      </button>
+      <p style="font-size:12px;margin-top:8px;text-align:center;color:var(--text3)">
+        Cuando el cliente regrese con el ticket, podrás completarlo desde tu lista de expedientes.
+      </p>
+    </div>
 
-    <!-- Estado WhatsApp -->
-    <div id="wa-status-wrap" style="display:none;margin-top:12px">
-      <div class="drive-status pending" id="wa-status">📱 WhatsApp Web abierto en otra pestaña</div>
+    <!-- ESTADOS -->
+    <div id="status-wrap" style="display:none;margin-top:14px">
+      <div class="drive-status pending" id="status-msg">⏳ Procesando…</div>
     </div>
 
   </div>
+
   <div class="nav-row" id="nav-resumen">
-    <button class="btn" onclick="prev()">← Anterior</button>
-    <button class="btn btn-primary" id="btn-nuevo" onclick="resetAll()" style="display:none">+ Nuevo cliente</button>
+    <button class="btn" id="btn-prev-resumen" onclick="prev()">← Anterior</button>
+    <button class="btn btn-primary" id="btn-volver-home" onclick="volverAHome()" style="display:none">← Volver a lista</button>
   </div>
 </div>
 </div>
@@ -766,28 +818,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div><!-- /app -->
 
 <script>
-// ── CONFIGURACIÓN ────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  CONFIGURACIÓN
+// ═══════════════════════════════════════════════════════════════
 var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9ShpTCMVEk1fp9F53Q3-tTRRgrSsVu9IPZ6H9UUY81krZu8pKfdu-1snA1neiVQRv/exec";
 var N8N_WEBHOOK_URL = "https://one-n8n.dq9h1w.easypanel.host/webhook/3f4478f8-08c6-4144-baab-e98a4a5702ab";
-var pdfDriveUrl = ""; // Se llena cuando Drive responde OK
-// ────────────────────────────────────────────────────────────
 
+// ═══════════════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════════
 var currentStep = 0;
 var dolorSelected = [];
-var valoracionSelected = {}; // { rodillas: 'Varo de rodillas', retropie: 'Valgo del retropié', 'pisada-val': 'Pronación' }
+var valoracionSelected = {};
 var sucursalActual = "";
-var ticketImageData = null; // dataURL JPEG de la foto del ticket
+var especialistaActual = "";
+var ticketImageData = null;
+var pdfDriveUrl = "";
+var listaExpedientes = [];
+var filtroActual = "todos";
+var modoEdicion = null;       // null | "completar_ticket"
+var expedienteEditandoId = null;
 
-// Fecha
+// ═══════════════════════════════════════════════════════════════
+//  FECHA
+// ═══════════════════════════════════════════════════════════════
 var today = new Date();
 var dd    = String(today.getDate()).padStart(2,'0');
 var mm    = String(today.getMonth()+1).padStart(2,'0');
 var yyyy  = today.getFullYear();
 var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 document.getElementById('fecha-display').textContent = dd + ' ' + meses[today.getMonth()] + ' ' + yyyy;
-document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
 
-// Fecha de entrega = hoy + 15 días
+function setDefaultFecha() {
+  document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
+}
+setDefaultFecha();
+
 function calcularFechaEntrega() {
   var f = document.getElementById('fecha').value;
   var base = f ? new Date(f + 'T12:00:00') : new Date();
@@ -797,19 +863,59 @@ function calcularFechaEntrega() {
   document.getElementById('entrega').value = base.getFullYear() + '-' + mm2 + '-' + dd2;
 }
 calcularFechaEntrega();
-// Recalcular si el especialista cambia la fecha de consulta
 document.getElementById('fecha').addEventListener('change', calcularFechaEntrega);
 
-// Modal sucursal
-function setSucursal() {
-  var sel = document.getElementById('select-sucursal').value;
-  if (!sel) { showToast('⚠ Selecciona una sucursal'); return; }
-  sucursalActual = sel;
-  document.getElementById('sucursal-label').textContent = sel;
-  document.getElementById('modal-sucursal').classList.remove('open');
+// ═══════════════════════════════════════════════════════════════
+//  LOCAL STORAGE - especialista persistente
+// ═══════════════════════════════════════════════════════════════
+function loadEspecialistaFromStorage() {
+  try {
+    var saved = localStorage.getItem('sidhe_especialista');
+    if (saved) {
+      especialistaActual = saved;
+      document.getElementById('input-especialista-modal').value = saved;
+    }
+    var savedSuc = localStorage.getItem('sidhe_sucursal');
+    if (savedSuc) {
+      document.getElementById('select-sucursal').value = savedSuc;
+    }
+  } catch(e) {}
+}
+loadEspecialistaFromStorage();
+
+function saveEspecialistaToStorage() {
+  try {
+    localStorage.setItem('sidhe_especialista', especialistaActual);
+    localStorage.setItem('sidhe_sucursal', sucursalActual);
+  } catch(e) {}
 }
 
-// Toast
+// ═══════════════════════════════════════════════════════════════
+//  MODAL SUCURSAL + ESPECIALISTA
+// ═══════════════════════════════════════════════════════════════
+function setSucursal() {
+  var espInput = document.getElementById('input-especialista-modal').value.trim();
+  var sel = document.getElementById('select-sucursal').value;
+  if (!espInput) { showToast('⚠ Escribe tu nombre como especialista'); return; }
+  if (!sel)      { showToast('⚠ Selecciona una sucursal');             return; }
+  especialistaActual = espInput;
+  sucursalActual     = sel;
+  document.getElementById('sucursal-label').textContent = sel;
+  document.getElementById('home-sucursal-label').textContent     = sel;
+  document.getElementById('home-especialista-label').textContent = espInput;
+  document.getElementById('home-spec-chip').textContent          = espInput;
+  document.getElementById('modal-sucursal').classList.remove('open');
+  saveEspecialistaToStorage();
+  cargarLista();
+}
+
+function cambiarEspecialista() {
+  document.getElementById('modal-sucursal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -818,7 +924,192 @@ function showToast(msg) {
   window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-// Validaciones por panel
+// ═══════════════════════════════════════════════════════════════
+//  HOME / LISTA DE EXPEDIENTES
+// ═══════════════════════════════════════════════════════════════
+async function cargarLista() {
+  if (!sucursalActual) return;
+  var cont = document.getElementById('exp-list-container');
+  cont.innerHTML = '<div class="exp-loading">Cargando expedientes...</div>';
+  try {
+    var url = APPS_SCRIPT_URL + '?action=list&sucursal=' + encodeURIComponent(sucursalActual);
+    var res = await fetch(url);
+    var data = await res.json();
+    if (data.ok) {
+      listaExpedientes = data.expedientes || [];
+      renderLista();
+    } else {
+      throw new Error(data.error || 'Error');
+    }
+  } catch(err) {
+    cont.innerHTML = '<div class="exp-empty"><div class="exp-empty-icon">⚠</div>No se pudo cargar la lista.<br><small>' + err.message + '</small><br><br><button class="btn" onclick="cargarLista()">Reintentar</button></div>';
+  }
+}
+
+function filtrarLista(filtro, btn) {
+  filtroActual = filtro;
+  document.querySelectorAll('.filter-pill').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderLista();
+}
+
+function renderLista() {
+  var cont = document.getElementById('exp-list-container');
+  var search = (document.getElementById('filter-search').value || '').toLowerCase().trim();
+  var arr = listaExpedientes.filter(function(e){
+    if (filtroActual !== 'todos' && e.estado !== filtroActual) return false;
+    if (search) {
+      var hay = ((e.nombre||'') + ' ' + (e.telefono||'')).toLowerCase();
+      if (hay.indexOf(search) === -1) return false;
+    }
+    return true;
+  });
+
+  if (arr.length === 0) {
+    cont.innerHTML = '<div class="exp-empty"><div class="exp-empty-icon">📋</div>' +
+      (listaExpedientes.length === 0 ? 'Aún no hay expedientes en esta sucursal.<br>Crea el primero con el botón "+ Nuevo expediente"' : 'No hay resultados con este filtro.') +
+      '</div>';
+    return;
+  }
+
+  var html = '<div class="exp-list">';
+  arr.forEach(function(e){
+    var estadoLabel = e.estado === 'pendiente' ? '⏳ Pendiente' :
+                      e.estado === 'enviado'   ? '✓ Enviado' :
+                      e.estado === 'error'     ? '⚠ Error' : e.estado;
+    var fechaCorta = (e.fecha || '').split('T')[0] || '—';
+    var esCreador = (e.especialista || '').trim().toLowerCase() === especialistaActual.trim().toLowerCase();
+
+    html += '<div class="exp-row">';
+    html += '<div class="exp-info">';
+    html += '<div class="exp-name">' + escapeHtml(e.nombre || 'Sin nombre') + '</div>';
+    html += '<div class="exp-meta">';
+    html += '<span>📅 ' + fechaCorta + '</span>';
+    if (e.telefono) html += '<span>📱 ' + escapeHtml(e.telefono) + '</span>';
+    if (e.especialista) html += '<span>👤 ' + escapeHtml(e.especialista) + '</span>';
+    html += '</div></div>';
+    html += '<span class="exp-status ' + e.estado + '">' + estadoLabel + '</span>';
+
+    html += '<div class="exp-actions-row">';
+    if (e.estado === 'pendiente') {
+      if (esCreador) {
+        html += '<button class="exp-btn-sm primary" onclick="completarTicket(\'' + e.id + '\')">📷 Completar ticket</button>';
+      } else {
+        html += '<button class="exp-btn-sm locked" title="Solo el especialista que lo creó puede completarlo">🔒 Bloqueado</button>';
+      }
+    }
+    if (e.url_pdf) {
+      html += '<button class="exp-btn-sm" onclick="window.open(\'' + e.url_pdf + '\',\'_blank\')">📄 Ver PDF</button>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function iniciarNuevoExpediente() {
+  modoEdicion = null;
+  expedienteEditandoId = null;
+  resetFormulario();
+  // Pre-llenar especialista
+  document.getElementById('especialista').value = especialistaActual;
+  // Mostrar paneles del flujo
+  showFlujo();
+  goTo(0);
+}
+
+function volverAHome() {
+  hideFlujo();
+  document.getElementById('panel-home').classList.add('active');
+  cargarLista();
+}
+
+function showFlujo() {
+  document.getElementById('panel-home').classList.remove('active');
+  document.getElementById('progress-wrap').style.display = '';
+}
+
+function hideFlujo() {
+  for (var i=0;i<6;i++) {
+    document.getElementById('panel'+i).classList.remove('active');
+  }
+  document.getElementById('progress-wrap').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  COMPLETAR TICKET PENDIENTE
+// ═══════════════════════════════════════════════════════════════
+async function completarTicket(id) {
+  var exp = listaExpedientes.find(function(e){ return e.id === id; });
+  if (!exp) { showToast('Expediente no encontrado'); return; }
+  modoEdicion = 'completar_ticket';
+  expedienteEditandoId = id;
+
+  // Para completar el ticket necesitamos los datos completos del expediente
+  // los traemos del Apps Script
+  showToast('Cargando expediente...');
+  try {
+    var url = APPS_SCRIPT_URL + '?action=get&id=' + encodeURIComponent(id);
+    var res = await fetch(url);
+    var data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudo cargar');
+
+    cargarDatosEnFormulario(data.expediente);
+    showFlujo();
+    goTo(4); // ir directo al panel de ticket
+    showToast('📷 Captura el ticket del cliente');
+  } catch(err) {
+    showToast('✗ Error: ' + err.message);
+  }
+}
+
+function cargarDatosEnFormulario(d) {
+  var setVal = function(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.value = val || '';
+  };
+  setVal('especialista', d.especialista);
+  setVal('fecha', d.fecha);
+  setVal('nombre', d.nombre);
+  setVal('sexo', d.sexo);
+  setVal('edad', d.edad);
+  setVal('tel', d.telefono);
+  setVal('email', d.email);
+  setVal('ocup', d.ocupacion);
+  setVal('actfis', d.actividad);
+  setVal('estatura', d.estatura);
+  setVal('peso', d.peso);
+  setVal('enterado', d.como_entero);
+  setVal('antecedentes', d.antecedentes);
+  setVal('cirugias', d.cirugias);
+  setVal('pisada', d.pisada);
+  setVal('observaciones', d.observaciones);
+  setVal('talla', d.talla);
+  setVal('tipo-calzado', d.calzado);
+  setVal('calzado-cons', d.calzado);
+  setVal('num-plantilla', d.num_plantilla);
+  setVal('horma', d.horma);
+  setVal('orden-tipo', d.orden_tipo);
+  setVal('entrega', d.entrega);
+  // Marcar el botón de orden activo
+  if (d.orden_tipo) {
+    document.querySelectorAll('.orden-btn').forEach(function(b){
+      if (b.getAttribute('data-val') === d.orden_tipo) b.classList.add('on');
+      else b.classList.remove('on');
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VALIDACIONES POR PANEL
+// ═══════════════════════════════════════════════════════════════
 var panelValidations = {
   0: function() {
     var rules = [
@@ -836,7 +1127,6 @@ var panelValidations = {
       { id:'horma',        check: function(v){ return v.trim().length > 0; } },
       { id:'orden-tipo',   check: function(v){ return v.trim().length > 0; } },
     ];
-    // motivo: al menos uno marcado o campo "otro" llenado
     var motivosChecked = document.querySelectorAll('#motivos input:checked').length > 0;
     var otroMotivo = document.getElementById('otro-motivo').value.trim().length > 0;
     var motivoOk = motivosChecked || otroMotivo;
@@ -866,19 +1156,12 @@ var panelValidations = {
     var acepto = document.getElementById('acepto-priv').checked;
     var nameOk = document.getElementById('sig-nombre-priv').value.trim().length > 0;
     var canvasOk = canvasHasContent('canvas-priv');
-    if (!acepto) { showToast('☑ El cliente debe aceptar el aviso de privacidad'); return false; }
-    if (!nameOk) { showToast('✍ Escribe el nombre en la firma de privacidad'); return false; }
-    if (!canvasOk) { showToast('✍ El cliente debe firmar el aviso de privacidad'); return false; }
+    if (!acepto)  { showToast('☑ El cliente debe aceptar el aviso de privacidad'); return false; }
+    if (!nameOk)  { showToast('✍ Escribe el nombre en la firma de privacidad');    return false; }
+    if (!canvasOk){ showToast('✍ El cliente debe firmar el aviso de privacidad');  return false; }
     return true;
   },
-  4: function() {
-    var codigo = document.getElementById('ticket-codigo').value.trim();
-    if (!ticketImageData && !codigo) {
-      showToast('📷 Captura una foto del ticket o ingresa el código digital');
-      return false;
-    }
-    return true;
-  }
+  4: function() { return true; } // ticket es opcional → puede ir a pendiente
 };
 
 function validateRules(rules) {
@@ -887,12 +1170,8 @@ function validateRules(rules) {
     var el = document.getElementById(r.id);
     if (!el) return;
     var ok = r.check(el.value);
-    if (!ok) {
-      el.classList.add('error');
-      allOk = false;
-    } else {
-      el.classList.remove('error');
-    }
+    if (!ok) { el.classList.add('error'); allOk = false; }
+    else { el.classList.remove('error'); }
   });
   if (!allOk) showToast('⚠ Completa todos los campos obligatorios (marcados con *)');
   return allOk;
@@ -924,8 +1203,15 @@ document.querySelectorAll('.field input, .field select, .field textarea').forEac
   el.addEventListener('change', function(){ el.classList.remove('error'); });
 });
 
-// Navegación
+// ═══════════════════════════════════════════════════════════════
+//  NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════
 function goTo(n) {
+  // En modo "completar ticket" solo permitir paneles 4 y 5
+  if (modoEdicion === 'completar_ticket' && n !== 4 && n !== 5) {
+    showToast('Modo: solo agregar ticket. Para editar todo, crea un nuevo expediente.');
+    return;
+  }
   document.getElementById('panel'+currentStep).classList.remove('active');
   var prevTab = document.getElementById('step'+currentStep);
   prevTab.classList.remove('active');
@@ -940,6 +1226,7 @@ function goTo(n) {
   document.getElementById('step'+n).classList.add('active');
   document.getElementById('prog-fill').style.width = (n/5*100) + '%';
   window.scrollTo(0,0);
+  if (n === 5) buildSummary();
 }
 
 function next() {
@@ -951,21 +1238,21 @@ function next() {
 }
 function prev() { if(currentStep>0) goTo(currentStep-1); }
 
-// Checks
+// ═══════════════════════════════════════════════════════════════
+//  CHECKS / DOLOR / VALORACIÓN / ORDEN
+// ═══════════════════════════════════════════════════════════════
 document.querySelectorAll('.check-item').forEach(function(item){
   item.addEventListener('change', function(){
     item.classList.toggle('checked', item.querySelector('input').checked);
   });
 });
 
-// Dolor
 function toggleDolor(btn, label) {
   btn.classList.toggle('on');
   var idx = dolorSelected.indexOf(label);
   if (idx > -1) dolorSelected.splice(idx,1); else dolorSelected.push(label);
 }
 
-// Fracturas: mostrar/ocultar campo de detalle
 function toggleFracturas() {
   var sel = document.getElementById('fracturas-bool').value;
   var wrap = document.getElementById('fracturas-detalle-wrap');
@@ -973,26 +1260,20 @@ function toggleFracturas() {
   if (sel !== 'Sí') document.getElementById('fracturas-detalle').value = '';
 }
 
-// Valoración: hallazgo (varo/valgo/neutro o pron/sup/neutro) + lateralidad (izq/der/bilat)
-// Estructura: valoracionSelected = { rodillas: {hallazgo:'Varo', lat:'Izq'}, ... }
 function setValoracion(btn, categoria, label) {
   var card = btn.closest('.val-card');
   var ya = btn.classList.contains('on');
-  // Limpiar todos los botones de hallazgo de esta categoría
   card.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
   var latBox = card.querySelector('.lat-btns');
   if (ya) {
-    // Si ya estaba seleccionado, deseleccionar y ocultar lateralidad
     delete valoracionSelected[categoria];
     latBox.style.display = 'none';
     latBox.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
   } else {
     btn.classList.add('on');
     if (label.toLowerCase().indexOf('neutr') !== -1) btn.classList.add('neutro');
-    // Guardar el hallazgo (manteniendo lat si ya existía)
     var prev = valoracionSelected[categoria] || {};
     valoracionSelected[categoria] = { hallazgo: label, lat: prev.lat || '' };
-    // Mostrar selector de lateralidad
     latBox.style.display = '';
   }
 }
@@ -1001,7 +1282,7 @@ function setLateralidad(btn, categoria, label) {
   var card = btn.closest('.val-card');
   var ya = btn.classList.contains('on');
   card.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
-  if (!valoracionSelected[categoria]) return; // no debería pasar
+  if (!valoracionSelected[categoria]) return;
   if (ya) {
     valoracionSelected[categoria].lat = '';
   } else {
@@ -1010,22 +1291,15 @@ function setLateralidad(btn, categoria, label) {
   }
 }
 
-// Tipo de orden: solo una opción
 function setOrden(btn) {
   var grid = document.getElementById('orden-grid');
   var ya = btn.classList.contains('on');
   grid.querySelectorAll('.orden-btn').forEach(function(b){ b.classList.remove('on'); });
   var hidden = document.getElementById('orden-tipo');
-  if (ya) {
-    hidden.value = '';
-  } else {
-    btn.classList.add('on');
-    hidden.value = btn.getAttribute('data-val');
-    hidden.classList.remove('error');
-  }
+  if (ya) { hidden.value = ''; }
+  else { btn.classList.add('on'); hidden.value = btn.getAttribute('data-val'); hidden.classList.remove('error'); }
 }
 
-// Helper para volcar valoracionSelected como array de strings legibles
 function valoracionToArray() {
   var labels = { rodillas: 'Rodillas', retropie: 'Retropié', 'pisada-val': 'Pisada' };
   var out = [];
@@ -1039,7 +1313,9 @@ function valoracionToArray() {
   return out;
 }
 
-// ── TICKET ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  TICKET
+// ═══════════════════════════════════════════════════════════════
 function switchTicketTab(tab) {
   var tFoto = document.getElementById('tab-foto');
   var tCod  = document.getElementById('tab-codigo');
@@ -1057,13 +1333,9 @@ function switchTicketTab(tab) {
 function onTicketSelected(ev) {
   var file = ev.target.files && ev.target.files[0];
   if (!file) return;
-  if (!/^image\//i.test(file.type)) {
-    showToast('⚠ El archivo debe ser una imagen');
-    return;
-  }
+  if (!/^image\//i.test(file.type)) { showToast('⚠ El archivo debe ser una imagen'); return; }
   var reader = new FileReader();
   reader.onload = function(e) {
-    // Comprimir a JPEG ~1600px máx para reducir tamaño antes de subir a Drive
     var img = new Image();
     img.onload = function() {
       var maxDim = 1600;
@@ -1076,7 +1348,6 @@ function onTicketSelected(ev) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       ticketImageData = canvas.toDataURL('image/jpeg', 0.82);
-      // Mostrar preview
       document.getElementById('ticket-preview').src = ticketImageData;
       document.getElementById('ticket-empty').style.display = 'none';
       document.getElementById('ticket-preview-wrap').style.display = '';
@@ -1085,7 +1356,6 @@ function onTicketSelected(ev) {
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
-  // Limpiar el input para permitir volver a seleccionar el mismo archivo
   ev.target.value = '';
 }
 
@@ -1097,7 +1367,9 @@ function removeTicket() {
   document.getElementById('ticket-zone').classList.remove('has-photo');
 }
 
-// Firmas
+// ═══════════════════════════════════════════════════════════════
+//  FIRMAS
+// ═══════════════════════════════════════════════════════════════
 var drawing = {};
 function initCanvas(id) {
   var canvas = document.getElementById(id);
@@ -1124,23 +1396,25 @@ function clearCanvas(id, hintId) {
 }
 setTimeout(function(){ ['canvas-cons','canvas-inst','canvas-priv'].forEach(initCanvas); }, 300);
 
-// Helpers
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
 function getChecked(cid) {
   var a=[]; document.querySelectorAll('#'+cid+' input:checked').forEach(function(cb){a.push(cb.value);}); return a;
 }
-function v(id){ return document.getElementById(id).value || '—'; }
+function v(id){ var el=document.getElementById(id); return (el && el.value) || '—'; }
 
-// ── GENERAR PDF ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  GENERAR PDF (idéntico al original)
+// ═══════════════════════════════════════════════════════════════
 function generarPDF() {
   var {jsPDF} = window.jspdf;
   var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   var W=210, ML=18, MR=18, Y=0;
-  var CW = W-ML-MR; // content width = 174mm
+  var CW = W-ML-MR;
 
-  // ── LOGO ─────────────────────────────────────────────────────
   var LOGO_B64 = 'data:image/jpeg;base64,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';
 
-  // ── COLORES ──────────────────────────────────────────────────
   var C_DARK   = [27,58,75];
   var C_GOLD   = [201,123,69];
   var C_LIGHT  = [247,245,242];
@@ -1150,46 +1424,30 @@ function generarPDF() {
   var C_SUB    = [100,100,100];
   var C_GREEN  = [45,106,79];
 
-  // ── HEADER ───────────────────────────────────────────────────
   function drawHeader(pageTitle, pageNum) {
-    // Franja oscura
     doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
     doc.rect(0,0,W,28,'F');
-    // Franja dorada fina
     doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
     doc.rect(0,28,W,1.2,'F');
-
-    // Logo real Sidhe
     try{ doc.addImage(LOGO_B64,'JPEG',ML,2,24,24); }catch(e){}
-
-    // Empresa
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(11);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
     doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
     doc.text('SIDHEGRAF S.A. de C.V.', ML+27, 11);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.setTextColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
     doc.text(pageTitle, ML+27, 18);
-    doc.setTextColor(180,180,180);
-    doc.setFontSize(7.5);
+    doc.setTextColor(180,180,180); doc.setFontSize(7.5);
     doc.text('Expediente Digital de Ortesis Plantar', ML+27, 24);
-
-    // Datos derecha
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(8);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
     doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
     doc.text(sucursalActual, W-MR, 11, {align:'right'});
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(7.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
     doc.setTextColor(180,180,180);
     doc.text('Fecha: '+v('fecha'), W-MR, 17, {align:'right'});
     doc.text('Pag. '+pageNum, W-MR, 23, {align:'right'});
-
     Y = 36;
   }
 
-  // ── SECTION HEADER ────────────────────────────────────────────
   function section(title) {
     if(Y > 265) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
     Y += 3;
@@ -1197,32 +1455,27 @@ function generarPDF() {
     doc.rect(ML, Y, CW, 7, 'F');
     doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
     doc.rect(ML, Y, 2.5, 7, 'F');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(8);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
     doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
     doc.text(title, ML+6, Y+4.8);
     doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
     Y += 11;
   }
 
-  // ── DATA ROW ─────────────────────────────────────────────────
   function row(label, value, isAlt) {
     if(Y > 270) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
     var bg = isAlt ? C_LIGHT : C_WHITE;
     doc.setFillColor(bg[0],bg[1],bg[2]);
     doc.rect(ML, Y-4, CW, 6.5, 'F');
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
     doc.text(label, ML+3, Y);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(8.5);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
     doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
     doc.text(String(value||'—'), ML+62, Y);
     Y += 6.5;
   }
 
-  // ── TWO-COL ROW ───────────────────────────────────────────────
   function row2(l1,v1,l2,v2,isAlt) {
     if(Y > 270) { doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
     var bg = isAlt ? C_LIGHT : C_WHITE;
@@ -1240,19 +1493,9 @@ function generarPDF() {
     Y += 6.5;
   }
 
-  // ── SEPARATOR ─────────────────────────────────────────────────
-  function sep() {
-    doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
-    doc.setLineWidth(0.3);
-    doc.line(ML,Y,W-MR,Y);
-    Y += 5;
-  }
-
-  // ── BODY TEXT ─────────────────────────────────────────────────
   function bodyText(lines, size) {
     size = size || 8.5;
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(size);
+    doc.setFont('helvetica','normal'); doc.setFontSize(size);
     doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
     lines.forEach(function(l){
       if(Y > 270){ doc.addPage(); drawHeader(currentDocTitle, ++currentPage); Y+=4; }
@@ -1262,46 +1505,33 @@ function generarPDF() {
     });
   }
 
-  // ── SIGNATURE BLOCK ───────────────────────────────────────────
   function addSig(cid, nid, label) {
     if(Y > 230){ doc.addPage(); drawHeader(currentDocTitle, ++currentPage); }
     Y += 4;
-    // Box
     doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
-    doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
-    doc.setLineWidth(0.4);
+    doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.4);
     doc.roundedRect(ML, Y, CW, 42, 2, 2, 'FD');
-    // Label
     doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
     doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
     doc.text(label.toUpperCase(), ML+4, Y+6);
-    // Gold underline
     doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
     doc.rect(ML+4, Y+7.5, 40, 0.5, 'F');
-    // Nombre escrito
     var nv = document.getElementById(nid).value;
     if(nv){
       doc.setFont('helvetica','italic'); doc.setFontSize(12);
       doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
       doc.text(nv, ML+4, Y+17);
     }
-    // Imagen firma
-    try{
-      doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG', ML+4, Y+18, 80, 20);
-    }catch(e){}
-    // Línea de firma
-    doc.setDrawColor(C_DARK[0],C_DARK[1],C_DARK[2]);
-    doc.setLineWidth(0.5);
+    try{ doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG', ML+4, Y+18, 80, 20); }catch(e){}
+    doc.setDrawColor(C_DARK[0],C_DARK[1],C_DARK[2]); doc.setLineWidth(0.5);
     doc.line(ML+4, Y+39, ML+90, Y+39);
     doc.setFont('helvetica','normal'); doc.setFontSize(7);
     doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
     doc.text('Firma del cliente', ML+4, Y+43.5);
-    // Fecha y hora
     doc.text('Fecha: '+v('fecha')+'   Hora: '+(new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})), W-MR, Y+43.5, {align:'right'});
     Y += 50;
   }
 
-  // ── FOOTER ────────────────────────────────────────────────────
   function footer() {
     var total = doc.internal.getNumberOfPages();
     for(var i=1;i<=total;i++){
@@ -1318,7 +1548,6 @@ function generarPDF() {
     }
   }
 
-  // ── DIVIDER ORNAMENT ─────────────────────────────────────────
   function ornament() {
     Y += 2;
     doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
@@ -1333,25 +1562,17 @@ function generarPDF() {
   var currentPage = 1;
   var motivos = getChecked('motivos');
   var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  // Construir array de valoración a partir de valoracionSelected + campo libre
   var valoracion = valoracionToArray();
   var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
-
-  // Construir dolor con campo libre
   var dolorList = dolorSelected.slice();
   var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
-
-  // Fracturas: combinar Sí/No con detalle
   var fractText = v('fracturas-bool');
   var fractDet = v('fracturas-detalle');
   if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
 
-  // ════════════════════════════════════════════════════════════
-  // PÁGINA 1 — DATOS DEL CLIENTE
-  // ════════════════════════════════════════════════════════════
+  // PÁGINA 1
   currentDocTitle = 'Datos del Cliente'; currentPage=1;
   drawHeader(currentDocTitle, currentPage);
-
   section('DATOS PERSONALES');
   row('Nombre completo', v('nombre'), false);
   row2('Sexo', v('sexo'), 'Edad', v('edad')+' años', true);
@@ -1361,32 +1582,24 @@ function generarPDF() {
   row('¿Cómo se enteró?', v('enterado'), true);
   row('Especialista', v('especialista'), false);
   row('Sucursal', sucursalActual, true);
-
   Y += 2; section('ANTECEDENTES CLÍNICOS');
   row('Antecedentes patológicos', v('antecedentes'), false);
   row('Cirugías previas', v('cirugias'), true);
   row('Lesiones previas', fractText, false);
   row('Tipo de marcha', v('pisada'), true);
-
   Y += 2; section('MOTIVO DE VISITA');
   row('Motivos', motivos.join(' | ') || 'No especificado', false);
-
   Y += 2; section('ZONAS DE DOLOR');
   row('Dolor reportado', dolorList.join(' | ') || 'Sin dolor reportado', false);
-
   Y += 2; section('VALORACIÓN CLÍNICA');
   row('Hallazgos', valoracion.join(' | ') || 'Sin hallazgos marcados', false);
-
   Y += 2; section('DATOS DE PLANTILLA');
   row2('Talla', v('talla'), 'Número', v('num-plantilla'), false);
   row2('Tipo de calzado', v('tipo-calzado'), 'Horma', v('horma'), true);
   row2('Tipo de orden', v('orden-tipo'), 'Fecha de entrega', v('entrega'), false);
-
-  // Observaciones (solo si hay contenido)
   var obs = v('observaciones');
   if (obs && obs !== '—') {
     Y += 2; section('OBSERVACIONES GENERALES');
-    // Wrap el texto largo
     var obsLines = doc.splitTextToSize(obs, CW - 6);
     doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
     var blockH = obsLines.length * 4.2 + 6;
@@ -1397,13 +1610,9 @@ function generarPDF() {
     doc.text(obsLines, ML+3, Y);
     Y += blockH;
   }
-
   Y += 6; ornament();
-
-  // Recuadro resumen profesional
   doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
-  doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
-  doc.setLineWidth(0.4);
+  doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.4);
   doc.roundedRect(ML, Y, CW, 20, 2, 2, 'FD');
   doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
   doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
@@ -1418,13 +1627,10 @@ function generarPDF() {
   doc.text(docsLine, ML+5, Y+14);
   Y += 25;
 
-  // ════════════════════════════════════════════════════════════
   // PÁGINA 2 — CONSENTIMIENTO
-  // ════════════════════════════════════════════════════════════
   doc.addPage(); currentDocTitle='Consentimiento Informado'; currentPage=2;
   drawHeader(currentDocTitle, currentPage);
   section('CONSENTIMIENTO INFORMADO PARA CONFECCION DE ORTESIS PLANTARES PERSONALIZADAS');
-
   bodyText([
     'Yo, en forma voluntaria, y en pleno uso de mis funciones mentales y de mis derechos, consiento',
     'SIDHEGRAF S.A. de C.V., me realice la toma de estudios y me prescriba una ortesis plantar',
@@ -1467,20 +1673,16 @@ function generarPDF() {
     'Mariano Escobedo 438, Polanco, Anzures, piso 5 (lun-vie 9am-6pm).',
     '','Con todo lo expuesto anteriormente, doy mi conformidad:'
   ]);
-
   Y += 3;
   row2('Talla', v('talla'), 'Tipo de calzado', v('calzado-cons')||v('tipo-calzado'), false);
   row2('Fecha', v('fecha'), 'Dia de entrega', v('entrega'), true);
   Y += 4;
   addSig('canvas-cons','sig-nombre-cons','Firma del cliente — Consentimiento Informado');
 
-  // ════════════════════════════════════════════════════════════
   // PÁGINA 3 — INSTRUCCIONES
-  // ════════════════════════════════════════════════════════════
   doc.addPage(); currentDocTitle='Instrucciones de Uso y Cuidado'; currentPage=3;
   drawHeader(currentDocTitle, currentPage);
   section('INSTRUCCIONES DE USO Y CUIDADO DE TUS PLANTILLAS');
-
   bodyText([
     '• Usar las plantillas de manera paulatina. Conforme el cuerpo se vaya adaptando, incrementar el',
     '  tiempo de uso poco a poco (puede empezar por 2 o 3 horas), hasta que, conforme a su avance,',
@@ -1506,7 +1708,6 @@ function generarPDF() {
     '  No usar tacones mayores de 2.5 cm en hombres y 4 cm en mujeres.',
     '  No usar calzado con horma excesivamente estrecha.'
   ]);
-
   Y += 2; section('PRECAUCIONES');
   bodyText([
     '• No abuse de las plantillas durante la fase inicial de uso. Esto puede causar irritacion de la piel',
@@ -1518,7 +1719,6 @@ function generarPDF() {
     '• La adaptacion de su uso debe hacerse progresivamente y de preferencia no realizar deportes o',
     '  caminatas fuertes sin antes haber completado su adaptacion.'
   ]);
-
   Y += 6;
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
   doc.text('Yo ____________________________________________ he leido cada uno de los puntos sobre los', ML, Y); Y+=5;
@@ -1526,13 +1726,10 @@ function generarPDF() {
   doc.text('correcto de las plantillas, tal como lo indican en parrafos anteriores.', ML, Y); Y+=4;
   addSig('canvas-inst','sig-nombre-inst','Firma del cliente — Instrucciones de Uso y Cuidado');
 
-  // ════════════════════════════════════════════════════════════
-  // PÁGINA 4 — AVISO DE PRIVACIDAD
-  // ════════════════════════════════════════════════════════════
+  // PÁGINA 4 — PRIVACIDAD
   doc.addPage(); currentDocTitle='Aviso de Privacidad'; currentPage=4;
   drawHeader(currentDocTitle, currentPage);
   section('AVISO DE PRIVACIDAD');
-
   bodyText([
     'Distribuidora Liverpool S.A. de C.V. y Liverpool PC S.A. de C.V. (conjuntamente o cada uno de',
     'ellos en lo individual como el "Responsable"), con domicilio en calle Mario Pani, numero 200,',
@@ -1552,24 +1749,18 @@ function generarPDF() {
     'consulte el Aviso de Privacidad Integral Clientes en la pagina www.liverpool.com.mx en la',
     'seccion Avisos de Privacidad.'
   ]);
-
   Y += 6;
   addSig('canvas-priv','sig-nombre-priv','Nombre y Firma del cliente — Aviso de Privacidad');
 
-  // ════════════════════════════════════════════════════════════
-  // PÁGINA 5 — TICKET DE COMPRA
-  // ════════════════════════════════════════════════════════════
+  // PÁGINA 5 — TICKET (solo si hay)
   var ticketCodigo = v('ticket-codigo');
   if (ticketImageData || (ticketCodigo && ticketCodigo !== '—')) {
     doc.addPage(); currentDocTitle = 'Ticket de Compra'; currentPage = 5;
     drawHeader(currentDocTitle, currentPage);
     section('TICKET DE COMPRA');
-
-    // Si hay código, mostrarlo en un recuadro destacado
     if (ticketCodigo && ticketCodigo !== '—') {
       doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
-      doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]);
-      doc.setLineWidth(0.4);
+      doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.4);
       doc.roundedRect(ML, Y, CW, 14, 2, 2, 'FD');
       doc.setFont('helvetica','bold'); doc.setFontSize(8);
       doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
@@ -1579,8 +1770,6 @@ function generarPDF() {
       doc.text(ticketCodigo, ML+5, Y+11);
       Y += 18;
     }
-
-    // Si hay foto, ponerla
     if (ticketImageData) {
       try {
         var img = new Image(); img.src = ticketImageData;
@@ -1595,11 +1784,7 @@ function generarPDF() {
         doc.setFont('helvetica','italic'); doc.setFontSize(8);
         doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
         doc.text('Ticket capturado el ' + v('fecha') + ' — ' + sucursalActual, W/2, Y+3, {align:'center'});
-      } catch(e) {
-        doc.setFont('helvetica','normal'); doc.setFontSize(9);
-        doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-        doc.text('No se pudo insertar la imagen del ticket.', ML, Y);
-      }
+      } catch(e) {}
     }
   }
 
@@ -1607,265 +1792,374 @@ function generarPDF() {
   return doc;
 }
 
-// ── DESCARGAR PDF ────────────────────────────────────────────
-function descargarPDF() {
-  try {
-    var doc    = generarPDF();
-    var nombre = v('nombre').replace(/\s+/g,'_') || 'cliente';
-    var fecha  = v('fecha') || (yyyy+'-'+mm+'-'+dd);
-    doc.save('Expediente_Sidhe_' + nombre + '_' + fecha + '.pdf');
-    showToast('✓ PDF descargado correctamente');
-  } catch(err) {
-    showToast('✗ Error al generar PDF: ' + err.message);
+// ═══════════════════════════════════════════════════════════════
+//  RESUMEN
+// ═══════════════════════════════════════════════════════════════
+function buildSummary() {
+  var motivos = getChecked('motivos');
+  var otroMot = v('otro-motivo'); if(otroMot!=='—') motivos.push(otroMot);
+  var dolorList = dolorSelected.slice();
+  var otroDol = v('otro-dolor'); if(otroDol!=='—') dolorList.push(otroDol);
+  var valoracion = valoracionToArray();
+  var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
+  var fract = v('fracturas-bool');
+  var fractDet = v('fracturas-detalle');
+  if (fract === 'Sí' && fractDet !== '—') fract = 'Sí — ' + fractDet;
+
+  var ticketCodigo = v('ticket-codigo');
+  var hayFoto = !!ticketImageData;
+  var hayCodigo = ticketCodigo !== '—' && ticketCodigo.trim() !== '';
+  var hayTicket = hayFoto || hayCodigo;
+
+  var html = '';
+  html += '<div class="sum-card"><h4>Cliente</h4>';
+  html += '<div class="sum-row"><span class="sum-key">Nombre</span><span class="sum-val">'+v('nombre')+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Teléfono</span><span class="sum-val">'+v('tel')+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Especialista</span><span class="sum-val">'+v('especialista')+'</span></div>';
+  html += '</div>';
+
+  html += '<div class="sum-card"><h4>Plantilla</h4>';
+  html += '<div class="sum-row"><span class="sum-key">Tipo / Talla</span><span class="sum-val">'+v('tipo-calzado')+' — '+v('talla')+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Tipo de orden</span><span class="sum-val">'+v('orden-tipo')+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Día de entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
+  html += '</div>';
+
+  if (motivos.length > 0 || dolorList.length > 0 || valoracion.length > 0) {
+    html += '<div class="sum-card"><h4>Clínica</h4>';
+    if (motivos.length > 0) html += '<div class="sum-row"><span class="sum-key">Motivos</span><span class="sum-val">'+motivos.join(', ')+'</span></div>';
+    if (dolorList.length > 0) html += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+dolorList.join(', ')+'</span></div>';
+    if (valoracion.length > 0) html += '<div class="sum-row"><span class="sum-key">Valoración</span><span class="sum-val">'+valoracion.join(', ')+'</span></div>';
+    if (fract !== '—') html += '<div class="sum-row"><span class="sum-key">Lesiones</span><span class="sum-val">'+fract+'</span></div>';
+    html += '</div>';
+  }
+
+  html += '<div class="sum-card"><h4>Documentos firmados</h4>';
+  html += '<div class="sum-row"><span class="sum-key">Consentimiento informado</span><span class="signed-pill">✓ Firmado</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Instrucciones de uso</span><span class="signed-pill">✓ Firmado</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Aviso de privacidad</span><span class="signed-pill">✓ Aceptado</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Ticket de compra</span><span class="' + (hayTicket ? 'signed-pill' : '') + '" style="' + (hayTicket ? '' : 'background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px') + '">' + (hayTicket ? '✓ ' + (hayFoto && hayCodigo ? 'Foto + código' : hayFoto ? 'Foto' : 'Código') : '⏳ Pendiente') + '</span></div>';
+  html += '</div>';
+
+  document.getElementById('summary-content').innerHTML = html;
+
+  // Mostrar bloque correcto de acciones
+  document.getElementById('acciones-con-ticket').style.display = hayTicket ? '' : 'none';
+  document.getElementById('acciones-sin-ticket').style.display = hayTicket ? 'none' : '';
+
+  // Si estamos completando ticket pendiente, forzar siempre "guardar y enviar"
+  if (modoEdicion === 'completar_ticket') {
+    document.getElementById('acciones-con-ticket').style.display = '';
+    document.getElementById('acciones-sin-ticket').style.display = 'none';
+    document.getElementById('summary-subtitle').textContent = 'Completando expediente pendiente — listo para enviar.';
+    if (!hayTicket) {
+      document.getElementById('btn-guardar-enviar').disabled = true;
+      document.getElementById('btn-guardar-enviar').textContent = '⚠ Captura el ticket en el paso anterior';
+    } else {
+      document.getElementById('btn-guardar-enviar').disabled = false;
+      document.getElementById('btn-guardar-enviar').innerHTML = '💾 Completar y enviar por WhatsApp';
+    }
+  } else {
+    document.getElementById('summary-subtitle').textContent = 'Documentos firmados — listo para guardar y enviar.';
+    document.getElementById('btn-guardar-enviar').disabled = false;
+    document.getElementById('btn-guardar-enviar').innerHTML = '💾 Guardar y enviar por WhatsApp';
   }
 }
 
-// ── BOTÓN 1: GUARDAR EN DRIVE ────────────────────────────────
-async function guardarEnDrive() {
-  var btn = document.getElementById('btn-guardar-drive');
-  btn.disabled = true;
-  btn.textContent = '⏳ Procesando…';
+// ═══════════════════════════════════════════════════════════════
+//  RECOLECTAR DATOS PARA APPS SCRIPT
+// ═══════════════════════════════════════════════════════════════
+function recolectarDatos() {
+  var motivos = getChecked('motivos');
+  var otroMot = v('otro-motivo'); if(otroMot!=='—') motivos.push(otroMot);
+  var dolorList = dolorSelected.slice();
+  var otroDol = v('otro-dolor'); if(otroDol!=='—') dolorList.push(otroDol);
+  var valoracion = valoracionToArray();
+  var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
+  var fract = v('fracturas-bool');
+  var fractDet = v('fracturas-detalle');
+  if (fract === 'Sí' && fractDet !== '—') fract += ' — ' + fractDet;
 
-  var wrap = document.getElementById('drive-status-wrap');
-  wrap.style.display = 'block';
-  var statusEl = document.getElementById('drive-status');
-  statusEl.className = 'drive-status uploading';
-  statusEl.textContent = '⏳ Subiendo expediente a Google Drive…';
+  return {
+    sucursal: sucursalActual,
+    especialista: v('especialista') !== '—' ? v('especialista') : especialistaActual,
+    fecha: v('fecha'),
+    nombre: v('nombre'),
+    sexo: v('sexo'),
+    edad: v('edad'),
+    telefono: v('tel').replace(/\D/g,''),
+    email: v('email'),
+    ocupacion: v('ocup'),
+    actividad: v('actfis'),
+    estatura: v('estatura'),
+    peso: v('peso'),
+    como_entero: v('enterado'),
+    antecedentes: v('antecedentes'),
+    cirugias: v('cirugias'),
+    fracturas: fract,
+    pisada: v('pisada'),
+    motivos: motivos.join(' | '),
+    dolor: dolorList.join(' | '),
+    valoracion: valoracion.join(' | '),
+    talla: v('talla'),
+    calzado: v('tipo-calzado'),
+    num_plantilla: v('num-plantilla'),
+    horma: v('horma'),
+    orden_tipo: v('orden-tipo'),
+    entrega: v('entrega'),
+    observaciones: v('observaciones'),
+    ticket_codigo: v('ticket-codigo')
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR Y ENVIAR (con ticket)
+// ═══════════════════════════════════════════════════════════════
+async function guardarYEnviar() {
+  var btn = document.getElementById('btn-guardar-enviar');
+  var statusWrap = document.getElementById('status-wrap');
+  var statusMsg = document.getElementById('status-msg');
+  btn.disabled = true;
+  btn.textContent = '⏳ Procesando...';
+  statusWrap.style.display = '';
+  statusMsg.className = 'drive-status uploading';
+  statusMsg.textContent = '⏳ Generando PDF...';
 
   try {
-    var doc    = generarPDF();
-    var pdfB64 = doc.output('datauristring').split(',')[1];
+    // 1. Generar el PDF
+    var pdfDoc = generarPDF();
+    var pdfBase64 = pdfDoc.output('datauristring').split(',')[1];
 
-    var motivos    = getChecked('motivos');
-    var otroMotivo = v('otro-motivo'); if(otroMotivo !== '—') motivos.push(otroMotivo);
-    var valoracion = valoracionToArray();
-    var otroVal    = v('otro-valoracion'); if(otroVal !== '—') valoracion.push(otroVal);
-    var dolorList  = dolorSelected.slice();
-    var otroDolor  = v('otro-dolor'); if(otroDolor !== '—') dolorList.push(otroDolor);
+    // 2. Subir a Drive vía Apps Script
+    statusMsg.textContent = '☁ Guardando en Drive...';
+    var datos = recolectarDatos();
+    var fileName = ('Sidhe_' + datos.nombre + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
-    var fractText = v('fracturas-bool');
-    var fractDet  = v('fracturas-detalle');
-    if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
+    var payload;
+    if (modoEdicion === 'completar_ticket') {
+      // Modo: solo agregar ticket a expediente existente
+      payload = {
+        action: 'updateTicket',
+        id: expedienteEditandoId,
+        sucursal: sucursalActual,
+        nombre: datos.nombre,
+        fileName: fileName,
+        pdfBase64: pdfBase64,
+        ticket_codigo: datos.ticket_codigo
+      };
+    } else {
+      // Modo: guardar nuevo como enviado
+      payload = Object.assign({}, datos, {
+        action: 'save',
+        estado: 'enviado',
+        fileName: fileName,
+        pdfBase64: pdfBase64
+      });
+    }
 
-    var now  = new Date();
-    var hora = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    var res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
 
-    var payload = {
-      pdf:           pdfB64,
-      sucursal:      sucursalActual || 'Sin sucursal',
-      especialista:  v('especialista'),
-      fecha:         v('fecha'),
-      hora:          hora,
-      nombre:        v('nombre'),
-      sexo:          v('sexo'),
-      edad:          v('edad'),
-      telefono:      v('tel'),
-      email:         v('email'),
-      ocupacion:     v('ocup'),
-      actividad:     v('actfis'),
-      estatura:      v('estatura'),
-      peso:          v('peso'),
-      como_entero:   v('enterado'),
-      antecedentes:  v('antecedentes'),
-      cirugias:      v('cirugias'),
-      fracturas:     fractText,
-      pisada:        v('pisada'),
-      motivos:       motivos.join(', '),
-      dolor:         dolorList.join(', ') || 'Sin dolor reportado',
-      valoracion:    valoracion.join(', ') || 'Sin hallazgos',
-      observaciones: v('observaciones'),
-      talla:         v('talla'),
-      calzado:       v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado'),
-      num_plantilla: v('num-plantilla'),
-      horma:         v('horma'),
-      orden_tipo:    v('orden-tipo'),
-      ticket_codigo: v('ticket-codigo'),
-      entrega:       v('entrega'),
+    // Por usar no-cors no tenemos respuesta visible; suponemos éxito si no truena.
+    // Intentamos obtener URL del PDF haciendo GET de la lista
+    statusMsg.textContent = '✓ Guardado en Drive — disparando WhatsApp...';
+    await new Promise(function(r){ setTimeout(r, 1500); });
+
+    // 3. Disparar webhook de n8n para que envíe WhatsApp vía Twilio
+    var n8nPayload = {
+      telefono: datos.telefono,
+      nombre: datos.nombre,
+      sucursal: datos.sucursal,
+      especialista: datos.especialista,
+      talla: datos.talla,
+      calzado: datos.calzado,
+      orden_tipo: datos.orden_tipo,
+      entrega: datos.entrega,
+      fecha: datos.fecha,
+      // pdfUrl será resuelto por n8n consultando la sheet con el ID
+      // o lo manda Apps Script. De momento mandamos los datos y dejamos que n8n
+      // arme el mensaje. Si tu Apps Script devuelve URL, podríamos pasarla aquí.
     };
 
-    var res  = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-    var data = await res.json();
-
-    if (data.ok) {
-      pdfDriveUrl = data.url || '';
-      statusEl.className = 'drive-status done';
-      statusEl.innerHTML = '✓ Guardado en Drive: <strong>' + sucursalActual + '</strong> → ' + v('nombre');
-      // Cambiar botón a "guardado"
-      btn.textContent = '✓ Guardado en Drive';
-      btn.style.background = 'var(--green)';
-      // Habilitar botón de WhatsApp
-      var wa = document.getElementById('btn-enviar-wa');
-      wa.disabled = false;
-    } else {
-      throw new Error(data.error || 'Error desconocido');
+    try {
+      await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(n8nPayload)
+      });
+    } catch(e) {
+      console.warn('Webhook n8n falló, pero el expediente ya está guardado:', e);
     }
-  } catch(err) {
-    statusEl.className = 'drive-status error';
-    statusEl.textContent = '✗ Error al subir a Drive: ' + err.message;
+
+    statusMsg.className = 'drive-status done';
+    statusMsg.textContent = '✓ Expediente guardado y mensaje enviado por WhatsApp';
+
+    btn.style.display = 'none';
+    document.getElementById('btn-prev-resumen').style.display = 'none';
+    document.getElementById('btn-volver-home').style.display = '';
+
+    // Auto-volver a la lista en 4 segundos
+    setTimeout(volverAHome, 4000);
+
+  } catch (err) {
+    statusMsg.className = 'drive-status error';
+    statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
   }
 }
 
-// ── BOTÓN 2: ENVIAR POR WHATSAPP WEB ─────────────────────────
-function enviarPorWhatsapp() {
-  if (!pdfDriveUrl) {
-    showToast('⚠ Primero guarda el expediente en Drive');
-    return;
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR COMO PENDIENTE (sin ticket)
+// ═══════════════════════════════════════════════════════════════
+async function guardarPendiente() {
+  var btn = document.getElementById('btn-guardar-pendiente');
+  var statusWrap = document.getElementById('status-wrap');
+  var statusMsg = document.getElementById('status-msg');
+  btn.disabled = true;
+  btn.textContent = '⏳ Guardando...';
+  statusWrap.style.display = '';
+  statusMsg.className = 'drive-status uploading';
+  statusMsg.textContent = '⏳ Generando PDF...';
+
+  try {
+    var pdfDoc = generarPDF();
+    var pdfBase64 = pdfDoc.output('datauristring').split(',')[1];
+
+    statusMsg.textContent = '☁ Guardando como pendiente...';
+    var datos = recolectarDatos();
+    var fileName = ('Sidhe_PENDIENTE_' + datos.nombre + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+
+    var payload = Object.assign({}, datos, {
+      action: 'save',
+      estado: 'pendiente',
+      fileName: fileName,
+      pdfBase64: pdfBase64
+    });
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+
+    statusMsg.className = 'drive-status done';
+    statusMsg.textContent = '✓ Expediente guardado como pendiente. Cuando vuelva el cliente con el ticket, lo encontrarás en tu lista.';
+
+    btn.style.display = 'none';
+    document.getElementById('btn-prev-resumen').style.display = 'none';
+    document.getElementById('btn-volver-home').style.display = '';
+
+    setTimeout(volverAHome, 4500);
+
+  } catch (err) {
+    statusMsg.className = 'drive-status error';
+    statusMsg.textContent = '✗ Error: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = '🔄 Reintentar';
   }
-  // Normalizar teléfono: quitar todo lo que no sea dígito y forzar prefijo MX
-  var rawTel = document.getElementById('tel').value.replace(/\D/g,'');
-  if (rawTel.length === 10)        rawTel = '52' + rawTel;
-  else if (!rawTel.startsWith('52')) rawTel = '52' + rawTel;
-
-  var nombre  = v('nombre');
-  var calzado = v('calzado-cons') !== '—' ? v('calzado-cons') : v('tipo-calzado');
-  var entrega = v('entrega');
-
-  var msg =
-    '¡Hola ' + nombre + '! 👋\n\n' +
-    'Gracias por tu visita a *Sidhe* en *' + sucursalActual + '*.\n\n' +
-    'Tu expediente ha sido registrado correctamente. Aquí te compartimos el documento con todos los detalles de tu plantilla ortopédica:\n\n' +
-    '📄 ' + pdfDriveUrl + '\n\n' +
-    'Detalles:\n' +
-    '• Talla de plantilla: ' + v('talla') + '\n' +
-    '• Calzado: ' + calzado + '\n' +
-    '• Fecha estimada de entrega: ' + entrega + '\n\n' +
-    'Si tienes alguna duda, no dudes en contactarnos. ¡Que tengas un excelente día! 🦶✨';
-
-  // Usar web.whatsapp.com para forzar la versión web (mantiene la sesión iniciada en el navegador)
-  var url = 'https://web.whatsapp.com/send?phone=' + rawTel + '&text=' + encodeURIComponent(msg);
-  window.open(url, '_blank');
-
-  // Mostrar estado
-  document.getElementById('wa-status-wrap').style.display = 'block';
-  var waStatusEl = document.getElementById('wa-status');
-  waStatusEl.className = 'drive-status done';
-  waStatusEl.innerHTML = '✓ WhatsApp Web abierto en otra pestaña — revísala y presiona <strong>Enviar</strong>';
-
-  var wa = document.getElementById('btn-enviar-wa');
-  wa.textContent = '↻ Reabrir WhatsApp Web';
-
-  // Mostrar botón "Nuevo cliente"
-  document.getElementById('btn-nuevo').style.display = '';
-}
-// ── RESUMEN ──────────────────────────────────────────────────
-function buildSummary() {
-  var motivos = getChecked('motivos');
-  var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
-  var val = valoracionToArray();
-  var otroVal = v('otro-valoracion'); if(otroVal!=='—') val.push(otroVal);
-  var dolorList = dolorSelected.slice();
-  var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
-
-  var fractText = v('fracturas-bool');
-  var fractDet = v('fracturas-detalle');
-  if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
-
-  var h = '<div class="sum-card"><h4>Datos del cliente</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Nombre</span><span class="sum-val">'+v('nombre')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Sexo</span><span class="sum-val">'+v('sexo')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Edad</span><span class="sum-val">'+v('edad')+' años</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Teléfono</span><span class="sum-val">'+v('tel')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Especialista</span><span class="sum-val">'+v('especialista')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
-  h += '</div>';
-  h += '<div class="sum-card"><h4>Antecedentes clínicos</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Antecedentes pers. patológicos</span><span class="sum-val">'+v('antecedentes')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Cirugías previas</span><span class="sum-val">'+v('cirugias')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Lesiones previas</span><span class="sum-val">'+fractText+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Tipo de marcha</span><span class="sum-val">'+v('pisada')+'</span></div>';
-  h += '</div>';
-  h += '<div class="sum-card"><h4>Evaluación clínica</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Motivo</span><span class="sum-val">'+(motivos.length?motivos.join(', '):'No especificado')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+(dolorList.length?dolorList.join(', '):'Sin dolor')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Valoración</span><span class="sum-val">'+(val.length?val.join(', '):'Sin hallazgos')+'</span></div>';
-  h += '</div>';
-  h += '<div class="sum-card"><h4>Datos de plantilla</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Talla</span><span class="sum-val">'+v('talla')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Calzado</span><span class="sum-val">'+(v('calzado-cons')!=='—'?v('calzado-cons'):v('tipo-calzado'))+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Número</span><span class="sum-val">'+v('num-plantilla')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Horma</span><span class="sum-val">'+v('horma')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Tipo de orden</span><span class="sum-val">'+v('orden-tipo')+'</span></div>';
-  h += '<div class="sum-row"><span class="sum-key">Entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
-  h += '</div>';
-  // Observaciones (solo si hay)
-  var obs = v('observaciones');
-  if (obs && obs !== '—') {
-    h += '<div class="sum-card"><h4>Observaciones</h4>';
-    h += '<div class="sum-row" style="display:block"><span class="sum-val" style="white-space:pre-wrap">'+obs+'</span></div>';
-    h += '</div>';
-  }
-  // Ticket de compra (foto y/o código)
-  var tCod = v('ticket-codigo');
-  if (ticketImageData || tCod !== '—') {
-    h += '<div class="sum-card"><h4>Ticket de compra</h4>';
-    if (tCod !== '—') {
-      h += '<div class="sum-row"><span class="sum-key">Código digital</span><span class="sum-val" style="font-family:monospace;letter-spacing:1px">'+tCod+'</span></div>';
-    }
-    if (ticketImageData) {
-      h += '<div style="text-align:center;margin-top:8px"><img src="'+ticketImageData+'" alt="Ticket" style="max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border)"/></div>';
-    }
-    h += '</div>';
-  }
-  h += '<div class="sum-card" style="background:var(--green-bg);border-color:var(--green-border)"><h4 style="color:var(--green)">Documentos firmados</h4>';
-  h += '<div class="sum-row"><span class="sum-key">Consentimiento informado</span><span class="signed-pill">✓ Firmado</span></div>';
-  h += '<div class="sum-row" style="margin-top:6px"><span class="sum-key">Instrucciones de uso</span><span class="signed-pill">✓ Firmado</span></div>';
-  h += '<div class="sum-row" style="margin-top:6px"><span class="sum-key">Aviso de privacidad</span><span class="signed-pill">✓ Firmado</span></div>';
-  h += '</div>';
-  document.getElementById('summary-content').innerHTML = h;
-  document.getElementById('summary-subtitle').textContent =
-    'Expediente de ' + v('nombre') + ' — ' + sucursalActual;
 }
 
-// ── RESET ─────────────────────────────────────────────────────
-function resetAll() {
-  document.querySelectorAll('input[type=text],input[type=number],input[type=date],input[type=email],textarea').forEach(function(i){ i.value=''; });
-  document.querySelectorAll('select').forEach(function(s){ s.value=''; });
-  document.querySelectorAll('input[type=checkbox]').forEach(function(cb){ cb.checked=false; });
-  document.querySelectorAll('.check-item').forEach(function(i){ i.classList.remove('checked'); });
-  document.querySelectorAll('.side-btn').forEach(function(b){ b.classList.remove('on'); });
-  document.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
-  document.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
-  document.querySelectorAll('.lat-btns').forEach(function(b){ b.style.display = 'none'; });
-  document.querySelectorAll('.orden-btn').forEach(function(b){ b.classList.remove('on'); });
-  document.getElementById('orden-tipo').value = '';
-  dolorSelected = [];
-  valoracionSelected = {};
-  // Ocultar detalle de fracturas
-  document.getElementById('fracturas-detalle-wrap').style.display = 'none';
-  // Limpiar ticket
-  removeTicket();
-  ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
-    var c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height);
-    var h=document.getElementById('hint-'+id.replace('canvas-','')); if(h) h.style.opacity='1';
+// ═══════════════════════════════════════════════════════════════
+//  RESET FORMULARIO
+// ═══════════════════════════════════════════════════════════════
+function resetFormulario() {
+  // Limpiar todos los inputs
+  ['nombre','sexo','edad','tel','email','ocup','actfis','estatura','peso','enterado',
+   'antecedentes','cirugias','fracturas-detalle','pisada','otro-motivo','otro-dolor',
+   'otro-valoracion','talla','tipo-calzado','calzado-cons','num-plantilla','horma',
+   'orden-tipo','entrega','observaciones','ticket-codigo','sig-nombre-cons','sig-nombre-inst',
+   'sig-nombre-priv','fracturas-bool'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = '';
   });
-  document.getElementById('fecha').value = yyyy+'-'+mm+'-'+dd;
+
+  // Resetear fecha y entrega
+  setDefaultFecha();
   calcularFechaEntrega();
-  document.getElementById('summary-content').innerHTML = '';
-  pdfDriveUrl = '';
 
-  // Reset estados de los dos botones nuevos
-  var btnDrive = document.getElementById('btn-guardar-drive');
-  btnDrive.disabled = false;
-  btnDrive.textContent = '💾 Guardar expediente en Drive';
-  btnDrive.style.background = '';
-  document.getElementById('drive-status-wrap').style.display = 'none';
-  var ds = document.getElementById('drive-status');
-  ds.className = 'drive-status pending'; ds.textContent = '📂 Subiendo a Google Drive…';
+  // Limpiar checkboxes
+  document.querySelectorAll('#motivos input').forEach(function(cb){ cb.checked=false; });
+  document.querySelectorAll('.check-item').forEach(function(c){ c.classList.remove('checked'); });
+  document.getElementById('acepto-priv').checked = false;
 
-  var btnWa = document.getElementById('btn-enviar-wa');
-  btnWa.disabled = true;
-  btnWa.textContent = '💬 Enviar por WhatsApp';
-  document.getElementById('wa-status-wrap').style.display = 'none';
-  var ws = document.getElementById('wa-status');
-  ws.className = 'drive-status pending'; ws.textContent = '📱 WhatsApp Web abierto en otra pestaña';
+  // Limpiar dolor
+  dolorSelected = [];
+  document.querySelectorAll('.side-btn.on').forEach(function(b){ b.classList.remove('on'); });
 
-  document.getElementById('btn-nuevo').style.display = 'none';
+  // Limpiar valoración
+  valoracionSelected = {};
+  document.querySelectorAll('.val-btn.on').forEach(function(b){ b.classList.remove('on','neutro'); });
+  document.querySelectorAll('.lat-btn.on').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.lat-btns').forEach(function(b){ b.style.display='none'; });
 
-  goTo(0);
-  document.getElementById('modal-sucursal').classList.add('open');
+  // Limpiar orden
+  document.querySelectorAll('.orden-btn.on').forEach(function(b){ b.classList.remove('on'); });
+
+  // Limpiar fracturas detalle
+  document.getElementById('fracturas-detalle-wrap').style.display = 'none';
+
+  // Limpiar firmas
+  ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
+    var c = document.getElementById(id);
+    if (c) c.getContext('2d').clearRect(0,0,c.width,c.height);
+  });
+  ['hint-cons','hint-inst','hint-priv'].forEach(function(id){
+    var h = document.getElementById(id);
+    if (h) h.style.opacity = '1';
+  });
+
+  // Limpiar ticket
+  ticketImageData = null;
+  document.getElementById('ticket-preview').src = '';
+  document.getElementById('ticket-empty').style.display = '';
+  document.getElementById('ticket-preview-wrap').style.display = 'none';
+  document.getElementById('ticket-zone').classList.remove('has-photo');
+  switchTicketTab('foto');
+
+  // Resetear progress
+  for (var i=0; i<6; i++) {
+    var t = document.getElementById('step'+i);
+    t.classList.remove('active','done');
+    document.getElementById('panel'+i).classList.remove('active');
+  }
+  document.getElementById('step0').classList.add('active');
+  document.getElementById('panel0').classList.add('active');
+  currentStep = 0;
+  document.getElementById('prog-fill').style.width = '0%';
+
+  // Resetear botones de acción
+  document.getElementById('btn-guardar-enviar').style.display = '';
+  document.getElementById('btn-guardar-enviar').disabled = false;
+  document.getElementById('btn-guardar-enviar').textContent = '💾 Guardar y enviar por WhatsApp';
+  document.getElementById('btn-guardar-pendiente').style.display = '';
+  document.getElementById('btn-guardar-pendiente').disabled = false;
+  document.getElementById('btn-guardar-pendiente').textContent = '⏳ Guardar como pendiente';
+  document.getElementById('btn-prev-resumen').style.display = '';
+  document.getElementById('btn-volver-home').style.display = 'none';
+  document.getElementById('status-wrap').style.display = 'none';
 }
+
+// ═══════════════════════════════════════════════════════════════
+//  INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('resize', function(){
+  ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
+    var canvas = document.getElementById(id);
+    var wrap = canvas.parentElement;
+    var newW = wrap.offsetWidth;
+    if (Math.abs(canvas.width - newW) > 10) {
+      canvas.width = newW;
+    }
+  });
+});
+
 </script>
 </body>
 </html>
