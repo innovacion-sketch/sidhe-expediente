@@ -786,6 +786,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <p style="font-size:12px;margin-top:8px;text-align:center;color:var(--text3)">
         Se guardará en Drive y se enviará automáticamente al WhatsApp del cliente.
       </p>
+      <button class="btn-download" onclick="descargarPDFLocal()" style="margin-top:14px">
+        ⬇ Descargar PDF en local
+      </button>
     </div>
 
     <!-- CASO B: NO HAY TICKET -->
@@ -799,6 +802,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <p style="font-size:12px;margin-top:8px;text-align:center;color:var(--text3)">
         Cuando el cliente regrese con el ticket, podrás completarlo desde tu lista de expedientes.
       </p>
+      <button class="btn-download" onclick="descargarPDFLocal()" style="margin-top:14px">
+        ⬇ Descargar PDF en local
+      </button>
     </div>
 
     <!-- ESTADOS -->
@@ -821,7 +827,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 // ═══════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════
-var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsXORfdMJb8_cxYeQ2N1fOH7eB6lJxoFb7vbcSnxb2sLDWQXxtzLVwQnH6hRzB5Fhp/exec";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9ShpTCMVEk1fp9F53Q3-tTRRgrSsVu9IPZ6H9UUY81krZu8pKfdu-1snA1neiVQRv/exec";
 var N8N_WEBHOOK_URL = "https://one-n8n.dq9h1w.easypanel.host/webhook/3f4478f8-08c6-4144-baab-e98a4a5702ab";
 
 // ═══════════════════════════════════════════════════════════════
@@ -1957,17 +1963,37 @@ async function guardarYEnviar() {
       });
     }
 
-    var res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload)
-    });
+    // Apps Script desplegado para "Cualquier usuario" devuelve respuestas
+    // con CORS abierto, lo que permite leer la URL del PDF.
+    var url_pdf = '';
+    var expediente_id = '';
+    try {
+      var res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      });
+      var json = await res.json();
+      if (json && json.ok) {
+        url_pdf = json.url_pdf || '';
+        expediente_id = json.id || '';
+      } else {
+        throw new Error((json && json.error) || 'Apps Script no respondió ok');
+      }
+    } catch(e) {
+      // Si CORS bloquea, hacemos fallback a no-cors (sin respuesta legible)
+      console.warn('Fallback a no-cors:', e);
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+    }
 
-    // Por usar no-cors no tenemos respuesta visible; suponemos éxito si no truena.
-    // Intentamos obtener URL del PDF haciendo GET de la lista
     statusMsg.textContent = '✓ Guardado en Drive — disparando WhatsApp...';
-    await new Promise(function(r){ setTimeout(r, 1500); });
+    await new Promise(function(r){ setTimeout(r, 800); });
 
     // 3. Disparar webhook de n8n para que envíe WhatsApp vía Twilio
     var n8nPayload = {
@@ -1980,9 +2006,8 @@ async function guardarYEnviar() {
       orden_tipo: datos.orden_tipo,
       entrega: datos.entrega,
       fecha: datos.fecha,
-      // pdfUrl será resuelto por n8n consultando la sheet con el ID
-      // o lo manda Apps Script. De momento mandamos los datos y dejamos que n8n
-      // arme el mensaje. Si tu Apps Script devuelve URL, podríamos pasarla aquí.
+      url_pdf: url_pdf,
+      id: expediente_id
     };
 
     try {
@@ -2011,6 +2036,21 @@ async function guardarYEnviar() {
     statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DESCARGAR PDF EN LOCAL (sin guardar en Drive ni enviar WA)
+// ═══════════════════════════════════════════════════════════════
+function descargarPDFLocal() {
+  try {
+    var datos = recolectarDatos();
+    var pdfDoc = generarPDF();
+    var fileName = ('Sidhe_' + (datos.nombre || 'expediente') + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    pdfDoc.save(fileName);
+    showToast('⬇ PDF descargado en tu dispositivo');
+  } catch(err) {
+    showToast('✗ Error al descargar: ' + err.message);
   }
 }
 
