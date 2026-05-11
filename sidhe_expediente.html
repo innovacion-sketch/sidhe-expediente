@@ -827,7 +827,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 // ═══════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════
-var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzY-u2vqvVOoFwAAbtPWlq3pMRqnLn2M0KAiPoagPCkArjwS0QKtNG-pjzQbYynpOB1/exec";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOY_kpHDYQS8_EBfI5mOgRzJTThsL5yB0X9AzciHF9TERKDCmFKeSSRULObeOdp0N9/exec";
 
 // ═══════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
@@ -1912,6 +1912,9 @@ function recolectarDatos() {
 // ═══════════════════════════════════════════════════════════════
 //  GUARDAR Y ENVIAR (con ticket) — VERSIÓN CORREGIDA
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR Y ENVIAR (con ticket)
+// ═══════════════════════════════════════════════════════════════
 async function guardarYEnviar() {
   var btn = document.getElementById('btn-guardar-enviar');
   var statusWrap = document.getElementById('status-wrap');
@@ -1958,12 +1961,13 @@ async function guardarYEnviar() {
       res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
+        // ⬇️ CAMBIO CLAVE: text/plain evita el preflight CORS de Apps Script
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
     } catch (netErr) {
       clearTimeout(timeoutId);
-      throw new Error('No se pudo conectar con el servidor. Verifica que la URL del Apps Script sea la más reciente y que esté desplegado como Web App. Error: ' + netErr.message);
+      throw new Error('No se pudo conectar. Verifica la URL del Apps Script. Error: ' + netErr.message);
     }
     clearTimeout(timeoutId);
 
@@ -1972,19 +1976,13 @@ async function guardarYEnviar() {
     try {
       json = JSON.parse(resText);
     } catch(parseErr) {
-      console.error('Respuesta cruda del servidor:', resText);
-      throw new Error('El servidor no devolvió JSON válido. Revisa los logs de Apps Script. Respuesta: ' + resText.substring(0,200));
+      console.error('Respuesta cruda:', resText);
+      throw new Error('El servidor no devolvió JSON. Respuesta: ' + resText.substring(0,200));
     }
 
     if (!json || !json.ok) {
       throw new Error((json && json.error) || 'El servidor respondió con error');
     }
-
-    var url_pdf = json.url_pdf || '';
-    var expediente_id = json.id || '';
-
-    statusMsg.textContent = '✓ Guardado en Drive — enviando WhatsApp...';
-    await new Promise(function(r){ setTimeout(r, 800); });
 
     statusMsg.className = 'drive-status done';
     statusMsg.textContent = '✓ Expediente guardado y mensaje enviado por WhatsApp';
@@ -2000,7 +1998,7 @@ async function guardarYEnviar() {
     statusMsg.textContent = '✗ ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
-    console.error('Error completo:', err);
+    console.error('Error:', err);
   }
 }
 
@@ -2019,6 +2017,9 @@ function descargarPDFLocal() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR COMO PENDIENTE (sin ticket)
+// ═══════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
 //  GUARDAR COMO PENDIENTE (sin ticket)
 // ═══════════════════════════════════════════════════════════════
@@ -2055,12 +2056,13 @@ async function guardarPendiente() {
       res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
+        // ⬇️ CAMBIO CLAVE
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
     } catch (netErr) {
       clearTimeout(timeoutId);
-      throw new Error('No se pudo conectar con el servidor. Verifica la URL de Apps Script. Error: ' + netErr.message);
+      throw new Error('No se pudo conectar. Verifica la URL. Error: ' + netErr.message);
     }
     clearTimeout(timeoutId);
 
@@ -2070,7 +2072,7 @@ async function guardarPendiente() {
       json = JSON.parse(resText);
     } catch(parseErr) {
       console.error('Respuesta cruda:', resText);
-      throw new Error('El servidor no devolvió JSON válido. Respuesta: ' + resText.substring(0,200));
+      throw new Error('El servidor no devolvió JSON. Respuesta: ' + resText.substring(0,200));
     }
 
     if (!json || !json.ok) {
@@ -2078,7 +2080,7 @@ async function guardarPendiente() {
     }
 
     statusMsg.className = 'drive-status done';
-    statusMsg.textContent = '✓ Expediente guardado como pendiente. Cuando vuelva el cliente con el ticket, lo encontrarás en tu lista.';
+    statusMsg.textContent = '✓ Expediente guardado como pendiente.';
 
     btn.style.display = 'none';
     document.getElementById('btn-prev-resumen').style.display = 'none';
@@ -2091,7 +2093,7 @@ async function guardarPendiente() {
     statusMsg.textContent = '✗ ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
-    console.error('Error completo:', err);
+    console.error('Error:', err);
   }
 }
 
