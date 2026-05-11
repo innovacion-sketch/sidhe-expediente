@@ -1921,6 +1921,14 @@ function recolectarDatos() {
 // ═══════════════════════════════════════════════════════════════
 //  GUARDAR Y ENVIAR (con ticket)
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR Y ENVIAR (con ticket) — VERSIÓN CORREGIDA
+//  Cambios:
+//  1. Content-Type: application/json (no text/plain)
+//  2. Sin redirect: 'follow' (no necesario)
+//  3. Eliminado el fallback no-cors (ya no es necesario)
+//  4. Si el fetch falla, se muestra error real en lugar de silenciarlo
+// ═══════════════════════════════════════════════════════════════
 async function guardarYEnviar() {
   var btn = document.getElementById('btn-guardar-enviar');
   var statusWrap = document.getElementById('status-wrap');
@@ -1963,33 +1971,27 @@ async function guardarYEnviar() {
       });
     }
 
-    // Apps Script desplegado para "Cualquier usuario" devuelve respuestas
-    // con CORS abierto, lo que permite leer la URL del PDF.
-    var url_pdf = '';
-    var expediente_id = '';
-    try {
-      var res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload),
-        redirect: 'follow'
-      });
-      var json = await res.json();
-      if (json && json.ok) {
-        url_pdf = json.url_pdf || '';
-        expediente_id = json.id || '';
-      } else {
-        throw new Error((json && json.error) || 'Apps Script no respondió ok');
-      }
-    } catch(e) {
-      // Si CORS bloquea, hacemos fallback a no-cors (sin respuesta legible)
-      console.warn('Fallback a no-cors:', e);
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload)
-      });
+    // ── FETCH A APPS SCRIPT (CORS habilitado) ─────────────────
+    var res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error('Apps Script respondió con status ' + res.status);
+    }
+
+    var json = await res.json();
+    if (!json || !json.ok) {
+      throw new Error((json && json.error) || 'Apps Script no respondió ok');
+    }
+
+    var url_pdf = json.url_pdf || '';
+    var expediente_id = json.id || '';
+
+    if (!url_pdf) {
+      console.warn('⚠ url_pdf vacío en respuesta:', json);
     }
 
     statusMsg.textContent = '✓ Guardado en Drive — disparando WhatsApp...';
@@ -2014,7 +2016,7 @@ async function guardarYEnviar() {
       await fetch(N8N_WEBHOOK_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {'Content-Type':'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(n8nPayload)
       });
     } catch(e) {
@@ -2036,9 +2038,9 @@ async function guardarYEnviar() {
     statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
+    console.error('Error en guardarYEnviar:', err);
   }
 }
-
 // ═══════════════════════════════════════════════════════════════
 //  DESCARGAR PDF EN LOCAL (sin guardar en Drive ni enviar WA)
 // ═══════════════════════════════════════════════════════════════
@@ -2056,6 +2058,9 @@ function descargarPDFLocal() {
 
 // ═══════════════════════════════════════════════════════════════
 //  GUARDAR COMO PENDIENTE (sin ticket)
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  GUARDAR COMO PENDIENTE — VERSIÓN CORREGIDA
 // ═══════════════════════════════════════════════════════════════
 async function guardarPendiente() {
   var btn = document.getElementById('btn-guardar-pendiente');
@@ -2082,12 +2087,21 @@ async function guardarPendiente() {
       pdfBase64: pdfBase64
     });
 
-    await fetch(APPS_SCRIPT_URL, {
+    // ── FETCH A APPS SCRIPT (CORS habilitado) ─────────────────
+    var res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+    if (!res.ok) {
+      throw new Error('Apps Script respondió con status ' + res.status);
+    }
+
+    var json = await res.json();
+    if (!json || !json.ok) {
+      throw new Error((json && json.error) || 'Apps Script no respondió ok');
+    }
 
     statusMsg.className = 'drive-status done';
     statusMsg.textContent = '✓ Expediente guardado como pendiente. Cuando vuelva el cliente con el ticket, lo encontrarás en tu lista.';
@@ -2103,9 +2117,9 @@ async function guardarPendiente() {
     statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
+    console.error('Error en guardarPendiente:', err);
   }
 }
-
 // ═══════════════════════════════════════════════════════════════
 //  RESET FORMULARIO
 // ═══════════════════════════════════════════════════════════════
