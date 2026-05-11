@@ -827,8 +827,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 // ═══════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════
-var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHevCscC_D8eAQkINL_riDFKBSe6aTMdDEfC8-rLhK6di7kLt_KO7qL25ug8VxcFDJ/exec";
-var N8N_WEBHOOK_URL = "https://one-n8n.dq9h1w.easypanel.host/webhook/3f4478f8-08c6-4144-baab-e98a4a5702ab";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLuh0ANgTc95AV-5nEHO8O2pEIFaobYHzyrnt_yGdpKvLdyUjXZZlWDDk6UjTE2l2q/exec";
+
 
 // ═══════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
@@ -1998,30 +1998,7 @@ async function guardarYEnviar() {
     await new Promise(function(r){ setTimeout(r, 800); });
 
     // 3. Disparar webhook de n8n para que envíe WhatsApp vía Twilio
-    var n8nPayload = {
-      telefono: datos.telefono,
-      nombre: datos.nombre,
-      sucursal: datos.sucursal,
-      especialista: datos.especialista,
-      talla: datos.talla,
-      calzado: datos.calzado,
-      orden_tipo: datos.orden_tipo,
-      entrega: datos.entrega,
-      fecha: datos.fecha,
-      url_pdf: url_pdf,
-      id: expediente_id
-    };
-
-    try {
-      await fetch(N8N_WEBHOOK_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(n8nPayload)
-      });
-    } catch(e) {
-      console.warn('Webhook n8n falló, pero el expediente ya está guardado:', e);
-    }
+    
 
     statusMsg.className = 'drive-status done';
     statusMsg.textContent = '✓ Expediente guardado y mensaje enviado por WhatsApp';
