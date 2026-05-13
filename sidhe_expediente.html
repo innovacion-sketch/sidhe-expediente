@@ -506,6 +506,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="btn" onclick="volverAHome()">← Cancelar</button>
     <button class="btn btn-primary" id="btn-guardar-recepcion" onclick="guardarRecepcion()">💾 Guardar recepción</button>
   </div>
+
+  <button class="btn-download" onclick="descargarPDFRecepcionLocal()" style="margin-top:14px">
+    ⬇ Descargar PDF en local
+  </button>
 </div>
 </div>
 
@@ -938,7 +942,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 // ═══════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════
-var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfS8OA_V7aNEl-9iG20ChYSVfBT4iFqGlrC5sFrTxSUxj-LOs2jSr9ruRtobodx2jx/exec";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbkOolXuYGYxRq9WbDN1BnKZzx0C_weqVZGU_rRKgoDcPxKTuPjd_Xl27PdlECqHt1/exec";
 
 // ═══════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
@@ -2368,6 +2372,25 @@ function descargarPDFLocal() {
     var datos = recolectarDatos();
     var pdfDoc = generarPDF();
     var fileName = ('Sidhe_' + (datos.nombre || 'expediente') + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    pdfDoc.save(fileName);
+    showToast('⬇ PDF descargado en tu dispositivo');
+  } catch(err) {
+    showToast('✗ Error al descargar: ' + err.message);
+  }
+}
+
+function descargarPDFRecepcionLocal() {
+  try {
+    var nombre = document.getElementById('rec-nombre').value.trim();
+    if (!nombre) { showToast('✍ Captura el nombre del paciente'); return; }
+
+    var nombreFirma = document.getElementById('sig-nombre-rec').value.trim();
+    if (!nombreFirma) { showToast('✍ Escribe el nombre en la firma'); return; }
+    if (!canvasHasContent('canvas-rec')) { showToast('✍ El paciente debe firmar'); return; }
+
+    var pdfDoc = generarPDFRecepcion();
+    var fechaHoy = yyyy + '-' + mm + '-' + dd;
+    var fileName = ('Sidhe_RECEPCION_' + nombre + '_' + fechaHoy).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
     pdfDoc.save(fileName);
     showToast('⬇ PDF descargado en tu dispositivo');
   } catch(err) {
