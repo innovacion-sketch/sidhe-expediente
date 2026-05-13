@@ -684,11 +684,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <button type="button" class="orden-btn orden-garantia"  data-val="GARANTIA"            onclick="setOrden(this)">GARANTIA</button>
         <button type="button" class="orden-btn orden-ascenso"   data-val="ASCENSO PLAN"        onclick="setOrden(this)">ASCENSO PLAN</button>
         <button type="button" class="orden-btn orden-segui"     data-val="SEGUIMIENTO"         onclick="setOrden(this)">SEGUIMIENTO</button>
+        <button type="button" class="orden-btn orden-cortesia"  data-val="CORTESIA"            onclick="setOrden(this)">CORTESIA</button>
         <button type="button" class="orden-btn orden-plan1"     data-val="PLAN ORTESICO 1A ORDEN" onclick="setOrden(this)">PLAN ORTESICO 1A ORDEN</button>
         <button type="button" class="orden-btn orden-plan2"     data-val="PLAN ORTESICO 2A ORDEN" onclick="setOrden(this)">PLAN ORTESICO 2A ORDEN</button>
       </div>
       <input type="hidden" id="orden-tipo" value=""/>
       <span class="err-msg">Selecciona un tipo de orden</span>
+    </div>
+  </div>
+
+  <div class="form-grid cols1" style="margin-top:8px">
+    <div class="field"><label>Densidad <span style="color:var(--red)">*</span></label>
+      <select id="densidad">
+        <option value="">Seleccionar...</option>
+        <option value="Suave">Suave</option>
+        <option value="Intermedia">Intermedia</option>
+        <option value="Rigida">Rigida</option>
+        <option value="Deportiva">Deportiva</option>
+      </select>
+      <span class="err-msg">Campo obligatorio</span>
     </div>
   </div>
 
@@ -959,7 +973,7 @@ setDefaultFecha();
 function calcularFechaEntrega() {
   var f = document.getElementById('fecha').value;
   var base = f ? new Date(f + 'T12:00:00') : new Date();
-  base.setDate(base.getDate() + 15);
+  base.setDate(base.getDate() + 21);
   var dd2 = String(base.getDate()).padStart(2,'0');
   var mm2 = String(base.getMonth()+1).padStart(2,'0');
   document.getElementById('entrega').value = base.getFullYear() + '-' + mm2 + '-' + dd2;
@@ -1297,6 +1311,7 @@ function cargarDatosEnFormulario(d) {
   setVal('num-plantilla', d.num_plantilla);
   setVal('horma', d.horma);
   setVal('orden-tipo', d.orden_tipo);
+  setVal('densidad', d.densidad);
   setVal('entrega', d.entrega);
   if (d.orden_tipo) {
     document.querySelectorAll('.orden-btn').forEach(function(b){
@@ -1325,6 +1340,7 @@ var panelValidations = {
       { id:'num-plantilla',check: function(v){ return v.trim().length > 0; } },
       { id:'horma',        check: function(v){ return v.trim().length > 0; } },
       { id:'orden-tipo',   check: function(v){ return v.trim().length > 0; } },
+      { id:'densidad',     check: function(v){ return v.trim().length > 0; } },
     ];
     var motivosChecked = document.querySelectorAll('#motivos input:checked').length > 0;
     var otroMotivo = document.getElementById('otro-motivo').value.trim().length > 0;
@@ -1794,6 +1810,7 @@ function generarPDF() {
   row2('Talla', v('talla'), 'Número', v('num-plantilla'), false);
   row2('Tipo de calzado', v('tipo-calzado'), 'Horma', v('horma'), true);
   row2('Tipo de orden', v('orden-tipo'), 'Fecha de entrega', v('entrega'), false);
+  row('Densidad de plantilla', v('densidad'), true);
   var obs = v('observaciones');
   if (obs && obs !== '—') {
     Y += 2; section('OBSERVACIONES GENERALES');
@@ -2164,6 +2181,7 @@ function buildSummary() {
   html += '<div class="sum-card"><h4>Plantilla</h4>';
   html += '<div class="sum-row"><span class="sum-key">Tipo / Talla</span><span class="sum-val">'+v('tipo-calzado')+' — '+v('talla')+'</span></div>';
   html += '<div class="sum-row"><span class="sum-key">Tipo de orden</span><span class="sum-val">'+v('orden-tipo')+'</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Densidad</span><span class="sum-val">'+v('densidad')+'</span></div>';
   html += '<div class="sum-row"><span class="sum-key">Día de entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
   html += '</div>';
 
@@ -2246,6 +2264,7 @@ function recolectarDatos() {
     num_plantilla: v('num-plantilla'),
     horma: v('horma'),
     orden_tipo: v('orden-tipo'),
+    densidad: v('densidad'),
     entrega: v('entrega'),
     observaciones: v('observaciones'),
     ticket_codigo: v('ticket-codigo')
@@ -2439,7 +2458,7 @@ function resetFormulario() {
   ['nombre','sexo','edad','tel','email','ocup','actfis','estatura','peso','enterado',
    'antecedentes','cirugias','fracturas-detalle','pisada','otro-motivo','otro-dolor',
    'otro-valoracion','talla','tipo-calzado','calzado-cons','num-plantilla','horma',
-   'orden-tipo','entrega','observaciones','ticket-codigo','sig-nombre-cons','sig-nombre-inst',
+   'orden-tipo','densidad','entrega','observaciones','ticket-codigo','sig-nombre-cons','sig-nombre-inst',
    'sig-nombre-priv','fracturas-bool'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.value = '';
