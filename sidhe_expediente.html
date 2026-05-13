@@ -429,11 +429,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 
   <div class="sdiv"><span>Datos del paciente</span></div>
-  <div class="form-grid cols1">
+  <div class="form-grid cols2">
     <div class="field">
       <label>Nombre completo del paciente <span style="color:var(--red)">*</span></label>
       <input id="rec-nombre" placeholder="Nombre del paciente que recibe"/>
       <span class="err-msg">Campo obligatorio</span>
+    </div>
+    <div class="field">
+      <label>Teléfono WhatsApp <span style="color:var(--red)">*</span></label>
+      <input id="rec-telefono" placeholder="55 1234 5678" inputmode="numeric"/>
+      <span class="err-msg">Mínimo 10 dígitos</span>
     </div>
   </div>
 
@@ -465,9 +470,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <select id="rec-densidad">
         <option value="">Seleccionar...</option>
         <option value="Suave">Suave</option>
-        <option value="Media">Media</option>
-        <option value="Firme">Firme</option>
-        <option value="Extra firme">Extra firme</option>
+        <option value="Intermedia">Intermedia</option>
+        <option value="Rigida">Rigida</option>
+        <option value="Deportiva">Deportiva</option>
       </select>
       <span class="err-msg">Campo obligatorio</span>
     </div>
@@ -1141,7 +1146,7 @@ function hideFlujo() {
 // ═══════════════════════════════════════════════════════════════
 function iniciarRecepcion() {
   // Limpiar campos
-  ['rec-nombre','rec-horma','rec-talla','rec-densidad','rec-obs','sig-nombre-rec'].forEach(function(id){
+  ['rec-nombre','rec-telefono','rec-horma','rec-talla','rec-densidad','rec-obs','sig-nombre-rec'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1166,6 +1171,7 @@ async function guardarRecepcion() {
   // Validar
   var rules = [
     { id:'rec-nombre',   check: function(v){ return v.trim().length > 0; } },
+    { id:'rec-telefono', check: function(v){ return v.replace(/\D/g,'').length >= 10; } },
     { id:'rec-horma',    check: function(v){ return v.trim().length > 0; } },
     { id:'rec-talla',    check: function(v){ return v.trim().length > 0; } },
     { id:'rec-densidad', check: function(v){ return v.trim().length > 0; } }
@@ -1190,6 +1196,7 @@ async function guardarRecepcion() {
     var pdfBase64 = pdfDoc.output('datauristring').split(',')[1];
 
     var nombre = document.getElementById('rec-nombre').value.trim();
+    var telefono = document.getElementById('rec-telefono').value.replace(/\D/g,'');
     var fechaHoy = yyyy + '-' + mm + '-' + dd;
     var fileName = ('Sidhe_RECEPCION_' + nombre + '_' + fechaHoy).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
@@ -1199,6 +1206,7 @@ async function guardarRecepcion() {
       especialista: especialistaActual,
       fecha: fechaHoy,
       nombre: nombre,
+      telefono: telefono,
       horma: document.getElementById('rec-horma').value,
       talla: document.getElementById('rec-talla').value,
       densidad: document.getElementById('rec-densidad').value,
@@ -2029,6 +2037,17 @@ function generarPDFRecepcion() {
   doc.setFont('helvetica','bold'); doc.setFontSize(13);
   doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
   doc.text(document.getElementById('rec-nombre').value, ML+5, Y+16);
+
+  // Teléfono (a la derecha del paciente)
+  var telVal = document.getElementById('rec-telefono');
+  if (telVal && telVal.value) {
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
+    doc.text('TELÉFONO', ML+CW-55, Y+8);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
+    doc.text(telVal.value, ML+CW-55, Y+16);
+  }
 
   // Línea divisora
   doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.3);
