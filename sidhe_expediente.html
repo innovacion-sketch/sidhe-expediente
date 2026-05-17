@@ -958,6 +958,8 @@ var listaExpedientes = [];
 var filtroActual = "todos";
 var modoEdicion = null;       // null | "completar_ticket"
 var expedienteEditandoId = null;
+/* ═══ PARCHE 1 ═══ Variable para guardar las firmas capturadas */
+var firmasCapturadas = {};
 
 // ═══════════════════════════════════════════════════════════════
 //  FECHA
@@ -1172,6 +1174,8 @@ function iniciarRecepcion() {
   if (c) c.getContext('2d').clearRect(0,0,c.width,c.height);
   var h = document.getElementById('hint-rec');
   if (h) h.style.opacity = '1';
+  /* ═══ PARCHE EXTRA ═══ También limpiar la firma capturada de recepción */
+  delete firmasCapturadas['canvas-rec'];
   document.getElementById('rec-status-wrap').style.display = 'none';
   document.getElementById('btn-guardar-recepcion').disabled = false;
   document.getElementById('btn-guardar-recepcion').textContent = '💾 Guardar recepción';
@@ -1602,14 +1606,22 @@ function initCanvas(id) {
   }
   function start(e) { e.preventDefault(); drawing[id]=true; if(hintEl) hintEl.style.opacity='0'; var ctx=canvas.getContext('2d'); var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
   function move(e)  { e.preventDefault(); if(!drawing[id]) return; var ctx=canvas.getContext('2d'); var p=getPos(e); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#1B3A4B'; ctx.lineTo(p.x,p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
-  function end()    { drawing[id]=false; }
+  /* ═══ PARCHE 2 ═══ Capturar la firma al soltar el dedo/mouse */
+  function end()    {
+    if(drawing[id]){
+      try { firmasCapturadas[id] = canvas.toDataURL('image/png'); } catch(e){}
+    }
+    drawing[id]=false;
+  }
   canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move); canvas.addEventListener('mouseup',end); canvas.addEventListener('mouseleave',end);
   canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false}); canvas.addEventListener('touchend',end);
 }
+/* ═══ PARCHE 5 ═══ Limpiar firma capturada cuando se limpia el canvas */
 function clearCanvas(id, hintId) {
   var c = document.getElementById(id);
   c.getContext('2d').clearRect(0,0,c.width,c.height);
   var h = document.getElementById(hintId); if(h) h.style.opacity='1';
+  delete firmasCapturadas[id];
 }
 setTimeout(function(){ ['canvas-cons','canvas-inst','canvas-priv','canvas-rec'].forEach(initCanvas); }, 300);
 
@@ -1620,6 +1632,7 @@ function getChecked(cid) {
   var a=[]; document.querySelectorAll('#'+cid+' input:checked').forEach(function(cb){a.push(cb.value);}); return a;
 }
 function v(id){ var el=document.getElementById(id); return (el && el.value) || '—'; }
+
 
 // ═══════════════════════════════════════════════════════════════
 //  GENERAR PDF EXPEDIENTE
@@ -1739,7 +1752,11 @@ function generarPDF() {
       doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
       doc.text(nv, ML+4, Y+17);
     }
-    try{ doc.addImage(document.getElementById(cid).toDataURL('image/png'),'PNG', ML+4, Y+18, 80, 20); }catch(e){}
+    /* ═══ PARCHE 3 ═══ Usar firma capturada (en memoria) si existe; si no, leer del canvas en vivo */
+    try{
+      var firmaImg = firmasCapturadas[cid] || document.getElementById(cid).toDataURL('image/png');
+      doc.addImage(firmaImg,'PNG', ML+4, Y+18, 80, 20);
+    }catch(e){}
     doc.setDrawColor(C_DARK[0],C_DARK[1],C_DARK[2]); doc.setLineWidth(0.5);
     doc.line(ML+4, Y+39, ML+90, Y+39);
     doc.setFont('helvetica','normal'); doc.setFontSize(7);
@@ -2010,6 +2027,7 @@ function generarPDF() {
   return doc;
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 //  GENERAR PDF RECEPCIÓN
 // ═══════════════════════════════════════════════════════════════
@@ -2018,128 +2036,147 @@ function generarPDFRecepcion() {
   var doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   var W=210, ML=18, MR=18, Y=0;
   var CW = W-ML-MR;
-  var LOGO_B64 = 'data:image/jpeg;base64,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';
-  var C_DARK=[27,58,75], C_GOLD=[201,123,69], C_WHITE=[255,255,255], C_TEXT=[30,30,30], C_SUB=[100,100,100], C_LIGHT=[247,245,242], C_MID=[224,219,212];
+
+  var C_DARK   = [27,58,75];
+  var C_GOLD   = [201,123,69];
+  var C_LIGHT  = [247,245,242];
+  var C_MID    = [224,219,212];
+  var C_WHITE  = [255,255,255];
+  var C_TEXT   = [30,30,30];
+  var C_SUB    = [100,100,100];
 
   // Header
   doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
   doc.rect(0,0,W,28,'F');
   doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
   doc.rect(0,28,W,1.2,'F');
-  if(LOGO_B64){ try{ doc.addImage(LOGO_B64,'JPEG',ML,2,24,24); }catch(e){} }
   doc.setFont('helvetica','bold'); doc.setFontSize(11);
   doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
-  doc.text('SIDHEGRAF S.A. de C.V.', ML+27, 11);
+  doc.text('SIDHEGRAF S.A. de C.V.', ML, 11);
   doc.setFont('helvetica','normal'); doc.setFontSize(8);
   doc.setTextColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
-  doc.text('Comprobante de Recepción de Plantillas', ML+27, 18);
+  doc.text('Comprobante de Recepción de Plantillas', ML, 18);
   doc.setTextColor(180,180,180); doc.setFontSize(7.5);
-  doc.text(sucursalActual + '  |  ' + dd + '/' + mm + '/' + yyyy, ML+27, 24);
+  doc.text('Entrega al paciente', ML, 24);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+  doc.text(sucursalActual, W-MR, 11, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setTextColor(180,180,180);
+  doc.text('Fecha: '+dd+'/'+mm+'/'+yyyy, W-MR, 17, {align:'right'});
+  Y = 40;
 
-  Y = 42;
   // Título
-  doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
   doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
-  doc.text('RECEPCIÓN DE PLANTILLAS', W/2, Y, {align:'center'});
-  Y += 5;
-  doc.setDrawColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]); doc.setLineWidth(0.7);
-  doc.line(W/2-32, Y, W/2+32, Y);
-  Y += 14;
+  doc.text('COMPROBANTE DE RECEPCIÓN', W/2, Y, {align:'center'});
+  Y += 8;
 
-  // Card de datos
-  doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
-  doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.3);
-  doc.roundedRect(ML, Y, CW, 68, 2, 2, 'FD');
+  // Línea decorativa
+  doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+  doc.rect(W/2-25, Y, 50, 0.8, 'F');
+  Y += 10;
 
-  // Paciente
-  doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('PACIENTE', ML+5, Y+8);
-  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  // Texto declarativo
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
   doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-  doc.text(document.getElementById('rec-nombre').value, ML+5, Y+16);
+  var declaracion = [
+    'Por medio del presente documento hago constar que en esta fecha he recibido',
+    'a mi entera satisfacción las plantillas ortopédicas personalizadas que fueron',
+    'elaboradas conforme al estudio clínico y especificaciones acordadas con',
+    'SIDHEGRAF S.A. de C.V.'
+  ];
+  declaracion.forEach(function(l){ doc.text(l, ML, Y); Y += 5.5; });
+  Y += 6;
 
-  // Teléfono (a la derecha del paciente)
-  var telVal = document.getElementById('rec-telefono');
-  if (telVal && telVal.value) {
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  // Sección de datos
+  doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+  doc.rect(ML, Y, CW, 7, 'F');
+  doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+  doc.rect(ML, Y, 2.5, 7, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+  doc.text('DATOS DEL PACIENTE Y LA PLANTILLA ENTREGADA', ML+6, Y+4.8);
+  Y += 11;
+
+  // Filas de datos
+  function rowRec(label, value, isAlt) {
+    var bg = isAlt ? C_LIGHT : C_WHITE;
+    doc.setFillColor(bg[0],bg[1],bg[2]);
+    doc.rect(ML, Y-4, CW, 6.5, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
     doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-    doc.text('TELÉFONO', ML+CW-55, Y+8);
-    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text(label, ML+3, Y);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
     doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-    doc.text(telVal.value, ML+CW-55, Y+16);
+    doc.text(String(value||'—'), ML+62, Y);
+    Y += 6.5;
   }
-
-  // Línea divisora
-  doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.3);
-  doc.line(ML+5, Y+22, ML+CW-5, Y+22);
-
-  // Datos plantilla (3 columnas)
-  var colW = (CW - 20) / 3;
-  doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('HORMA', ML+5, Y+30);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11);
-  doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-  doc.text(document.getElementById('rec-horma').value, ML+5, Y+38);
-
-  doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('TALLA', ML+5+colW, Y+30);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11);
-  doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-  doc.text(document.getElementById('rec-talla').value, ML+5+colW, Y+38);
-
-  doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('DENSIDAD', ML+5+colW*2, Y+30);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11);
-  doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-  doc.text(document.getElementById('rec-densidad').value, ML+5+colW*2, Y+38);
+  rowRec('Nombre del paciente', document.getElementById('rec-nombre').value, false);
+  rowRec('Teléfono', document.getElementById('rec-telefono').value, true);
+  rowRec('Horma', document.getElementById('rec-horma').value, false);
+  rowRec('Talla', document.getElementById('rec-talla').value, true);
+  rowRec('Densidad', document.getElementById('rec-densidad').value, false);
+  rowRec('Sucursal', sucursalActual, true);
+  rowRec('Especialista', especialistaActual, false);
+  rowRec('Fecha de entrega', dd+'/'+mm+'/'+yyyy, true);
+  Y += 6;
 
   // Observaciones
-  var obs = document.getElementById('rec-obs').value;
+  var obs = document.getElementById('rec-obs').value.trim();
   if (obs) {
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-    doc.text('OBSERVACIONES', ML+5, Y+48);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.rect(ML, Y, CW, 7, 'F');
+    doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
+    doc.rect(ML, Y, 2.5, 7, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.setTextColor(C_WHITE[0],C_WHITE[1],C_WHITE[2]);
+    doc.text('OBSERVACIONES DE ENTREGA', ML+6, Y+4.8);
+    Y += 11;
+    var obsLines = doc.splitTextToSize(obs, CW - 6);
+    doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
+    var blockH = obsLines.length * 4.5 + 6;
+    doc.rect(ML, Y-4, CW, blockH, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
     doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-    var obsLines = doc.splitTextToSize(obs, CW-10);
-    doc.text(obsLines, ML+5, Y+55);
+    doc.text(obsLines, ML+3, Y);
+    Y += blockH + 6;
   }
 
-  Y += 78;
-
-  // Texto de conformidad
-  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  // Texto de cierre
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
   doc.setTextColor(C_TEXT[0],C_TEXT[1],C_TEXT[2]);
-  var textoConf = 'Por medio del presente documento, el paciente arriba mencionado confirma haber recibido en buen estado las plantillas ortopédicas personalizadas con las especificaciones detalladas, en la sucursal ' + sucursalActual + ' con fecha ' + dd + '/' + mm + '/' + yyyy + '.';
-  var lines = doc.splitTextToSize(textoConf, CW);
-  doc.text(lines, ML, Y);
-  Y += lines.length * 5 + 14;
+  doc.text('Recibo el producto en óptimas condiciones y conforme a lo solicitado.', ML, Y);
+  Y += 14;
 
   // Firma
   doc.setFillColor(C_LIGHT[0],C_LIGHT[1],C_LIGHT[2]);
   doc.setDrawColor(C_MID[0],C_MID[1],C_MID[2]); doc.setLineWidth(0.4);
-  doc.roundedRect(ML, Y, CW, 50, 2, 2, 'FD');
-  doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.roundedRect(ML, Y, CW, 46, 2, 2, 'FD');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
   doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('FIRMA DEL PACIENTE — RECEPCIÓN', ML+4, Y+6);
+  doc.text('FIRMA DE RECEPCIÓN DEL PACIENTE', ML+4, Y+6);
   doc.setFillColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
   doc.rect(ML+4, Y+7.5, 40, 0.5, 'F');
-  doc.setFont('helvetica','italic'); doc.setFontSize(12);
-  doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
-  doc.text(document.getElementById('sig-nombre-rec').value, ML+4, Y+17);
+  var nv = document.getElementById('sig-nombre-rec').value;
+  if (nv) {
+    doc.setFont('helvetica','italic'); doc.setFontSize(12);
+    doc.setTextColor(C_DARK[0],C_DARK[1],C_DARK[2]);
+    doc.text(nv, ML+4, Y+18);
+  }
+  /* ═══ PARCHE 4 ═══ Usar firma capturada (en memoria) si existe; si no, leer del canvas en vivo */
   try {
-    doc.addImage(document.getElementById('canvas-rec').toDataURL('image/png'),'PNG', ML+4, Y+19, 80, 22);
+    var firmaRec = firmasCapturadas['canvas-rec'] || document.getElementById('canvas-rec').toDataURL('image/png');
+    doc.addImage(firmaRec, 'PNG', ML+4, Y+19, 80, 22);
   } catch(e) {}
   doc.setDrawColor(C_DARK[0],C_DARK[1],C_DARK[2]); doc.setLineWidth(0.5);
-  doc.line(ML+4, Y+44, ML+90, Y+44);
+  doc.line(ML+4, Y+42, ML+90, Y+42);
   doc.setFont('helvetica','normal'); doc.setFontSize(7);
   doc.setTextColor(C_SUB[0],C_SUB[1],C_SUB[2]);
-  doc.text('Firma del paciente', ML+4, Y+48);
-  doc.text('Especialista: ' + especialistaActual, W-MR, Y+48, {align:'right'});
+  doc.text('Firma del paciente', ML+4, Y+45.5);
+  var hora = new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+  doc.text('Fecha: '+dd+'/'+mm+'/'+yyyy+'   Hora: '+hora, W-MR, Y+45.5, {align:'right'});
+  Y += 52;
 
   // Footer
   doc.setFillColor(C_DARK[0],C_DARK[1],C_DARK[2]);
@@ -2148,108 +2185,90 @@ function generarPDFRecepcion() {
   doc.rect(0,285.2,W,0.8,'F');
   doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
   doc.setTextColor(180,180,180);
-  doc.text('SIDHEGRAF S.A. de C.V.  |  '+sucursalActual+'  |  Recepción registrada el '+dd+'/'+mm+'/'+yyyy, ML, 291.5);
+  doc.text('SIDHEGRAF S.A. de C.V.  |  '+sucursalActual+'  |  Comprobante generado el '+dd+'/'+mm+'/'+yyyy, ML, 291.5);
   doc.setTextColor(C_GOLD[0],C_GOLD[1],C_GOLD[2]);
   doc.text('Documento confidencial — uso exclusivo Sidhe', W-MR, 291.5, {align:'right'});
 
   return doc;
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 //  RESUMEN
 // ═══════════════════════════════════════════════════════════════
 function buildSummary() {
   var motivos = getChecked('motivos');
-  var otroMot = v('otro-motivo'); if(otroMot!=='—') motivos.push(otroMot);
-  var dolorList = dolorSelected.slice();
-  var otroDol = v('otro-dolor'); if(otroDol!=='—') dolorList.push(otroDol);
+  var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
   var valoracion = valoracionToArray();
   var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
-  var fract = v('fracturas-bool');
+  var dolorList = dolorSelected.slice();
+  var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
+  var fractText = v('fracturas-bool');
   var fractDet = v('fracturas-detalle');
-  if (fract === 'Sí' && fractDet !== '—') fract = 'Sí — ' + fractDet;
+  if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
 
-  var ticketCodigo = v('ticket-codigo');
-  var hayFoto = !!ticketImageData;
-  var hayCodigo = ticketCodigo !== '—' && ticketCodigo.trim() !== '';
-  var hayTicket = hayFoto || hayCodigo;
+  var tieneTicket = !!ticketImageData || (v('ticket-codigo') !== '—');
 
-  var html = '';
-  html += '<div class="sum-card"><h4>Cliente</h4>';
-  html += '<div class="sum-row"><span class="sum-key">Nombre</span><span class="sum-val">'+v('nombre')+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Teléfono</span><span class="sum-val">'+v('tel')+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Sucursal</span><span class="sum-val">'+sucursalActual+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Especialista</span><span class="sum-val">'+v('especialista')+'</span></div>';
+  var rows = [
+    ['Cliente', v('nombre')],
+    ['Sexo', v('sexo')],
+    ['Edad', v('edad')+' años'],
+    ['Teléfono', v('tel')],
+    ['Correo', v('email')],
+    ['Ocupación', v('ocup')],
+    ['Especialista', v('especialista')],
+    ['Sucursal', sucursalActual],
+    ['Lesiones previas', fractText],
+    ['Motivos', motivos.join(' · ') || 'Ninguno'],
+    ['Dolor', dolorList.join(' · ') || 'Sin dolor'],
+    ['Valoración', valoracion.join(' · ') || 'Sin hallazgos'],
+    ['Plantilla', v('horma')+' · talla '+v('talla')+' · '+v('num-plantilla')],
+    ['Tipo de orden', v('orden-tipo')],
+    ['Densidad', v('densidad')],
+    ['Entrega estimada', v('entrega')],
+    ['Ticket', tieneTicket ? (ticketImageData && v('ticket-codigo')!=='—' ? '📷 + 🔢' : (ticketImageData ? '📷 Foto' : '🔢 Código')) : '— Sin capturar'],
+  ];
+
+  var html = '<div class="sum-card"><h4>Datos del expediente</h4>';
+  rows.forEach(function(r){ html += '<div class="sum-row"><span class="sum-key">'+r[0]+'</span><span class="sum-val">'+r[1]+'</span></div>'; });
   html += '</div>';
-
-  html += '<div class="sum-card"><h4>Plantilla</h4>';
-  html += '<div class="sum-row"><span class="sum-key">Tipo / Talla</span><span class="sum-val">'+v('tipo-calzado')+' — '+v('talla')+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Tipo de orden</span><span class="sum-val">'+v('orden-tipo')+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Densidad</span><span class="sum-val">'+v('densidad')+'</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Día de entrega</span><span class="sum-val">'+v('entrega')+'</span></div>';
-  html += '</div>';
-
-  if (motivos.length > 0 || dolorList.length > 0 || valoracion.length > 0) {
-    html += '<div class="sum-card"><h4>Clínica</h4>';
-    if (motivos.length > 0) html += '<div class="sum-row"><span class="sum-key">Motivos</span><span class="sum-val">'+motivos.join(', ')+'</span></div>';
-    if (dolorList.length > 0) html += '<div class="sum-row"><span class="sum-key">Dolor</span><span class="sum-val">'+dolorList.join(', ')+'</span></div>';
-    if (valoracion.length > 0) html += '<div class="sum-row"><span class="sum-key">Valoración</span><span class="sum-val">'+valoracion.join(', ')+'</span></div>';
-    if (fract !== '—') html += '<div class="sum-row"><span class="sum-key">Lesiones</span><span class="sum-val">'+fract+'</span></div>';
-    html += '</div>';
-  }
-
   html += '<div class="sum-card"><h4>Documentos firmados</h4>';
   html += '<div class="sum-row"><span class="sum-key">Consentimiento informado</span><span class="signed-pill">✓ Firmado</span></div>';
   html += '<div class="sum-row"><span class="sum-key">Instrucciones de uso</span><span class="signed-pill">✓ Firmado</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Aviso de privacidad</span><span class="signed-pill">✓ Aceptado</span></div>';
-  html += '<div class="sum-row"><span class="sum-key">Ticket de compra</span><span class="' + (hayTicket ? 'signed-pill' : '') + '" style="' + (hayTicket ? '' : 'background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px') + '">' + (hayTicket ? '✓ ' + (hayFoto && hayCodigo ? 'Foto + código' : hayFoto ? 'Foto' : 'Código') : '⏳ Pendiente') + '</span></div>';
+  html += '<div class="sum-row"><span class="sum-key">Aviso de privacidad</span><span class="signed-pill">✓ Firmado</span></div>';
   html += '</div>';
-
   document.getElementById('summary-content').innerHTML = html;
 
-  document.getElementById('acciones-con-ticket').style.display = hayTicket ? '' : 'none';
-  document.getElementById('acciones-sin-ticket').style.display = hayTicket ? 'none' : '';
-
-  if (modoEdicion === 'completar_ticket') {
-    document.getElementById('acciones-con-ticket').style.display = '';
-    document.getElementById('acciones-sin-ticket').style.display = 'none';
-    document.getElementById('summary-subtitle').textContent = 'Completando expediente pendiente — listo para enviar.';
-    if (!hayTicket) {
-      document.getElementById('btn-guardar-enviar').disabled = true;
-      document.getElementById('btn-guardar-enviar').textContent = '⚠ Captura el ticket en el paso anterior';
-    } else {
-      document.getElementById('btn-guardar-enviar').disabled = false;
-      document.getElementById('btn-guardar-enviar').innerHTML = '💾 Completar y enviar por WhatsApp';
-    }
-  } else {
-    document.getElementById('summary-subtitle').textContent = 'Documentos firmados — listo para guardar y enviar.';
-    document.getElementById('btn-guardar-enviar').disabled = false;
-    document.getElementById('btn-guardar-enviar').innerHTML = '💾 Guardar y enviar por WhatsApp';
-  }
+  // Toggle de acciones según ticket
+  document.getElementById('acciones-con-ticket').style.display  = tieneTicket ? '' : 'none';
+  document.getElementById('acciones-sin-ticket').style.display  = tieneTicket ? 'none' : '';
+  document.getElementById('summary-subtitle').textContent       = tieneTicket
+    ? 'Documentos firmados — listo para guardar y enviar.'
+    : 'Documentos firmados — falta el ticket de compra.';
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  RECOLECTAR DATOS PARA APPS SCRIPT
+//  RECOLECTAR DATOS
 // ═══════════════════════════════════════════════════════════════
 function recolectarDatos() {
   var motivos = getChecked('motivos');
-  var otroMot = v('otro-motivo'); if(otroMot!=='—') motivos.push(otroMot);
-  var dolorList = dolorSelected.slice();
-  var otroDol = v('otro-dolor'); if(otroDol!=='—') dolorList.push(otroDol);
+  var otro = v('otro-motivo'); if(otro!=='—') motivos.push(otro);
   var valoracion = valoracionToArray();
   var otroVal = v('otro-valoracion'); if(otroVal!=='—') valoracion.push(otroVal);
-  var fract = v('fracturas-bool');
+  var dolorList = dolorSelected.slice();
+  var otroDolor = v('otro-dolor'); if(otroDolor!=='—') dolorList.push(otroDolor);
+  var fractText = v('fracturas-bool');
   var fractDet = v('fracturas-detalle');
-  if (fract === 'Sí' && fractDet !== '—') fract += ' — ' + fractDet;
+  if (fractText === 'Sí' && fractDet !== '—') fractText = 'Sí — ' + fractDet;
 
   return {
     sucursal: sucursalActual,
-    especialista: v('especialista') !== '—' ? v('especialista') : especialistaActual,
+    especialista: especialistaActual,
     fecha: v('fecha'),
     nombre: v('nombre'),
     sexo: v('sexo'),
     edad: v('edad'),
-    telefono: v('tel').replace(/\D/g,''),
+    telefono: v('tel'),
     email: v('email'),
     ocupacion: v('ocup'),
     actividad: v('actfis'),
@@ -2258,7 +2277,7 @@ function recolectarDatos() {
     como_entero: v('enterado'),
     antecedentes: v('antecedentes'),
     cirugias: v('cirugias'),
-    fracturas: fract,
+    lesiones: fractText,
     pisada: v('pisada'),
     motivos: motivos.join(' | '),
     dolor: dolorList.join(' | '),
@@ -2282,195 +2301,146 @@ async function guardarYEnviar() {
   var btn = document.getElementById('btn-guardar-enviar');
   var statusWrap = document.getElementById('status-wrap');
   var statusMsg = document.getElementById('status-msg');
+
   btn.disabled = true;
   btn.textContent = '⏳ Procesando...';
   statusWrap.style.display = '';
   statusMsg.className = 'drive-status uploading';
-  statusMsg.textContent = '⏳ Generando PDF...';
+  statusMsg.textContent = '⏳ Generando expediente PDF...';
 
   try {
     var pdfDoc = generarPDF();
     var pdfBase64 = pdfDoc.output('datauristring').split(',')[1];
-
-    statusMsg.textContent = '☁ Guardando en Drive...';
     var datos = recolectarDatos();
-    var fileName = ('Sidhe_' + datos.nombre + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    var nombre = datos.nombre || 'cliente';
+    var fileName = ('Sidhe_'+nombre+'_'+datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
-    var payload;
-    if (modoEdicion === 'completar_ticket') {
-      payload = {
-        action: 'updateTicket',
-        id: expedienteEditandoId,
-        sucursal: sucursalActual,
-        nombre: datos.nombre,
-        fileName: fileName,
-        pdfBase64: pdfBase64,
-        ticket_codigo: datos.ticket_codigo
-      };
-    } else {
-      payload = Object.assign({}, datos, {
-        action: 'save',
-        estado: 'enviado',
-        fileName: fileName,
-        pdfBase64: pdfBase64
-      });
-    }
+    var payload = Object.assign({}, datos, {
+      action: modoEdicion === 'completar_ticket' ? 'updateTicket' : 'saveExpediente',
+      id: expedienteEditandoId,
+      fileName: fileName,
+      pdfBase64: pdfBase64,
+      ticket_foto_base64: ticketImageData ? ticketImageData.split(',')[1] : '',
+      enviar_whatsapp: true
+    });
+
+    statusMsg.textContent = '☁ Guardando en Drive y enviando WhatsApp...';
 
     var controller = new AbortController();
-    var timeoutId = setTimeout(function(){ controller.abort(); }, 25000);
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 30000);
 
-    var res;
-    try {
-      res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        signal: controller.signal,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-    } catch (netErr) {
-      clearTimeout(timeoutId);
-      throw new Error('No se pudo conectar. Verifica la URL del Apps Script. Error: ' + netErr.message);
-    }
+    var res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
     clearTimeout(timeoutId);
 
     var resText = await res.text();
-    var json;
-    try {
-      json = JSON.parse(resText);
-    } catch(parseErr) {
-      console.error('Respuesta cruda:', resText);
-      throw new Error('El servidor no devolvió JSON. Respuesta: ' + resText.substring(0,200));
-    }
+    var json = JSON.parse(resText);
+    if (!json.ok) throw new Error(json.error || 'Error del servidor');
 
-    if (!json || !json.ok) {
-      throw new Error((json && json.error) || 'El servidor respondió con error');
-    }
-
+    pdfDriveUrl = json.url_pdf || '';
     statusMsg.className = 'drive-status done';
-    statusMsg.textContent = '✓ Expediente guardado y mensaje enviado por WhatsApp';
-
-    btn.style.display = 'none';
+    statusMsg.innerHTML = '✓ Expediente enviado correctamente' + (json.whatsapp_sent ? ' — WhatsApp enviado' : '');
     document.getElementById('btn-prev-resumen').style.display = 'none';
     document.getElementById('btn-volver-home').style.display = '';
+    btn.style.display = 'none';
 
-    setTimeout(volverAHome, 4000);
-
-  } catch (err) {
+  } catch(err) {
     statusMsg.className = 'drive-status error';
-    statusMsg.textContent = '✗ ' + err.message;
+    statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
-    console.error('Error:', err);
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  DESCARGAR PDF EN LOCAL
+//  DESCARGAR PDF LOCAL
 // ═══════════════════════════════════════════════════════════════
 function descargarPDFLocal() {
   try {
-    var datos = recolectarDatos();
     var pdfDoc = generarPDF();
-    var fileName = ('Sidhe_' + (datos.nombre || 'expediente') + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    var nombre = v('nombre') || 'cliente';
+    var fileName = ('Sidhe_'+nombre+'_'+v('fecha')).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
     pdfDoc.save(fileName);
-    showToast('⬇ PDF descargado en tu dispositivo');
+    showToast('✓ PDF descargado');
   } catch(err) {
-    showToast('✗ Error al descargar: ' + err.message);
+    showToast('✗ Error generando PDF');
   }
 }
 
 function descargarPDFRecepcionLocal() {
   try {
-    var nombre = document.getElementById('rec-nombre').value.trim();
-    if (!nombre) { showToast('✍ Captura el nombre del paciente'); return; }
-
-    var nombreFirma = document.getElementById('sig-nombre-rec').value.trim();
-    if (!nombreFirma) { showToast('✍ Escribe el nombre en la firma'); return; }
-    if (!canvasHasContent('canvas-rec')) { showToast('✍ El paciente debe firmar'); return; }
-
     var pdfDoc = generarPDFRecepcion();
-    var fechaHoy = yyyy + '-' + mm + '-' + dd;
-    var fileName = ('Sidhe_RECEPCION_' + nombre + '_' + fechaHoy).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    var nombre = document.getElementById('rec-nombre').value.trim() || 'paciente';
+    var fileName = ('Sidhe_RECEPCION_'+nombre+'_'+yyyy+'-'+mm+'-'+dd).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
     pdfDoc.save(fileName);
-    showToast('⬇ PDF descargado en tu dispositivo');
+    showToast('✓ PDF descargado');
   } catch(err) {
-    showToast('✗ Error al descargar: ' + err.message);
+    showToast('✗ Error generando PDF');
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  GUARDAR COMO PENDIENTE (sin ticket)
+//  GUARDAR PENDIENTE (sin ticket)
 // ═══════════════════════════════════════════════════════════════
 async function guardarPendiente() {
   var btn = document.getElementById('btn-guardar-pendiente');
   var statusWrap = document.getElementById('status-wrap');
   var statusMsg = document.getElementById('status-msg');
+
   btn.disabled = true;
   btn.textContent = '⏳ Guardando...';
   statusWrap.style.display = '';
   statusMsg.className = 'drive-status uploading';
-  statusMsg.textContent = '⏳ Generando PDF...';
+  statusMsg.textContent = '⏳ Generando expediente PDF...';
 
   try {
     var pdfDoc = generarPDF();
     var pdfBase64 = pdfDoc.output('datauristring').split(',')[1];
-
-    statusMsg.textContent = '☁ Guardando como pendiente...';
     var datos = recolectarDatos();
-    var fileName = ('Sidhe_PENDIENTE_' + datos.nombre + '_' + datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
+    var nombre = datos.nombre || 'cliente';
+    var fileName = ('Sidhe_PEND_'+nombre+'_'+datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
     var payload = Object.assign({}, datos, {
-      action: 'save',
-      estado: 'pendiente',
+      action: 'saveExpediente',
       fileName: fileName,
-      pdfBase64: pdfBase64
+      pdfBase64: pdfBase64,
+      ticket_foto_base64: '',
+      enviar_whatsapp: false,
+      estado: 'pendiente'
     });
+
+    statusMsg.textContent = '☁ Guardando en Drive...';
 
     var controller = new AbortController();
     var timeoutId = setTimeout(function(){ controller.abort(); }, 25000);
 
-    var res;
-    try {
-      res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        signal: controller.signal,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-    } catch (netErr) {
-      clearTimeout(timeoutId);
-      throw new Error('No se pudo conectar. Verifica la URL. Error: ' + netErr.message);
-    }
+    var res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
     clearTimeout(timeoutId);
 
     var resText = await res.text();
-    var json;
-    try {
-      json = JSON.parse(resText);
-    } catch(parseErr) {
-      console.error('Respuesta cruda:', resText);
-      throw new Error('El servidor no devolvió JSON. Respuesta: ' + resText.substring(0,200));
-    }
-
-    if (!json || !json.ok) {
-      throw new Error((json && json.error) || 'El servidor respondió con error');
-    }
+    var json = JSON.parse(resText);
+    if (!json.ok) throw new Error(json.error || 'Error del servidor');
 
     statusMsg.className = 'drive-status done';
-    statusMsg.textContent = '✓ Expediente guardado como pendiente.';
-
-    btn.style.display = 'none';
+    statusMsg.textContent = '✓ Expediente guardado como pendiente';
     document.getElementById('btn-prev-resumen').style.display = 'none';
     document.getElementById('btn-volver-home').style.display = '';
+    btn.style.display = 'none';
 
-    setTimeout(volverAHome, 4500);
-
-  } catch (err) {
+  } catch(err) {
     statusMsg.className = 'drive-status error';
-    statusMsg.textContent = '✗ ' + err.message;
+    statusMsg.textContent = '✗ Error: ' + err.message;
     btn.disabled = false;
     btn.textContent = '🔄 Reintentar';
-    console.error('Error:', err);
   }
 }
 
@@ -2478,80 +2448,66 @@ async function guardarPendiente() {
 //  RESET FORMULARIO
 // ═══════════════════════════════════════════════════════════════
 function resetFormulario() {
-  ['nombre','sexo','edad','tel','email','ocup','actfis','estatura','peso','enterado',
-   'antecedentes','cirugias','fracturas-detalle','pisada','otro-motivo','otro-dolor',
-   'otro-valoracion','talla','tipo-calzado','calzado-cons','num-plantilla','horma',
-   'orden-tipo','densidad','entrega','observaciones','ticket-codigo','sig-nombre-cons','sig-nombre-inst',
-   'sig-nombre-priv','fracturas-bool'].forEach(function(id){
+  var ids = ['especialista','fecha','nombre','sexo','edad','tel','email','ocup','actfis','estatura','peso','enterado',
+             'antecedentes','cirugias','fracturas-bool','fracturas-detalle','pisada','otro-motivo','otro-dolor','otro-valoracion',
+             'talla','tipo-calzado','calzado-cons','num-plantilla','horma','orden-tipo','densidad','entrega','observaciones',
+             'sig-nombre-cons','sig-nombre-inst','sig-nombre-priv','ticket-codigo'];
+  ids.forEach(function(id){
     var el = document.getElementById(id);
-    if (el) el.value = '';
+    if (el) { el.value=''; el.classList.remove('error'); }
   });
-
   setDefaultFecha();
   calcularFechaEntrega();
-
-  document.querySelectorAll('#motivos input').forEach(function(cb){ cb.checked=false; });
-  document.querySelectorAll('.check-item').forEach(function(c){ c.classList.remove('checked'); });
-  document.getElementById('acepto-priv').checked = false;
-
-  dolorSelected = [];
-  document.querySelectorAll('.side-btn.on').forEach(function(b){ b.classList.remove('on'); });
-
-  valoracionSelected = {};
-  document.querySelectorAll('.val-btn.on').forEach(function(b){ b.classList.remove('on','neutro'); });
-  document.querySelectorAll('.lat-btn.on').forEach(function(b){ b.classList.remove('on'); });
-  document.querySelectorAll('.lat-btns').forEach(function(b){ b.style.display='none'; });
-
-  document.querySelectorAll('.orden-btn.on').forEach(function(b){ b.classList.remove('on'); });
-
   document.getElementById('fracturas-detalle-wrap').style.display = 'none';
-
+  document.querySelectorAll('#motivos input').forEach(function(cb){ cb.checked=false; });
+  document.querySelectorAll('.check-item').forEach(function(it){ it.classList.remove('checked'); });
+  document.querySelectorAll('.side-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.val-btn').forEach(function(b){ b.classList.remove('on','neutro'); });
+  document.querySelectorAll('.lat-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.lat-btns').forEach(function(b){ b.style.display='none'; });
+  document.querySelectorAll('.orden-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('acepto-priv').checked = false;
+  dolorSelected = [];
+  valoracionSelected = {};
+  /* ═══ PARCHE 6 ═══ Limpiar firmas capturadas además de los canvases */
   ['canvas-cons','canvas-inst','canvas-priv'].forEach(function(id){
     var c = document.getElementById(id);
     if (c) c.getContext('2d').clearRect(0,0,c.width,c.height);
+    delete firmasCapturadas[id];
   });
   ['hint-cons','hint-inst','hint-priv'].forEach(function(id){
     var h = document.getElementById(id);
     if (h) h.style.opacity = '1';
   });
-
-  ticketImageData = null;
-  document.getElementById('ticket-preview').src = '';
-  document.getElementById('ticket-empty').style.display = '';
-  document.getElementById('ticket-preview-wrap').style.display = 'none';
-  document.getElementById('ticket-zone').classList.remove('has-photo');
-  switchTicketTab('foto');
-
-  for (var i=0; i<6; i++) {
-    var t = document.getElementById('step'+i);
-    t.classList.remove('active','done');
-    document.getElementById('panel'+i).classList.remove('active');
-  }
-  document.getElementById('step0').classList.add('active');
-  document.getElementById('panel0').classList.add('active');
+  removeTicket();
   currentStep = 0;
   document.getElementById('prog-fill').style.width = '0%';
-
-  document.getElementById('btn-guardar-enviar').style.display = '';
+  for (var i=0;i<6;i++) {
+    var t = document.getElementById('step'+i);
+    if (t) { t.classList.remove('active','done'); }
+  }
+  document.getElementById('step0').classList.add('active');
+  document.getElementById('status-wrap').style.display = 'none';
   document.getElementById('btn-guardar-enviar').disabled = false;
   document.getElementById('btn-guardar-enviar').textContent = '💾 Guardar y enviar por WhatsApp';
-  document.getElementById('btn-guardar-pendiente').style.display = '';
+  document.getElementById('btn-guardar-enviar').style.display = '';
   document.getElementById('btn-guardar-pendiente').disabled = false;
   document.getElementById('btn-guardar-pendiente').textContent = '⏳ Guardar como pendiente';
+  document.getElementById('btn-guardar-pendiente').style.display = '';
   document.getElementById('btn-prev-resumen').style.display = '';
   document.getElementById('btn-volver-home').style.display = 'none';
-  document.getElementById('status-wrap').style.display = 'none';
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  INICIALIZACIÓN
+//  RESIZE — re-ajusta el ancho del canvas si cambia el viewport
+//  (la captura previa de firma en firmasCapturadas evita perderla)
 // ═══════════════════════════════════════════════════════════════
 window.addEventListener('resize', function(){
   ['canvas-cons','canvas-inst','canvas-priv','canvas-rec'].forEach(function(id){
     var canvas = document.getElementById(id);
     if (!canvas) return;
     var wrap = canvas.parentElement;
-    var newW = wrap.offsetWidth;
+    var newW = wrap.offsetWidth || 800;
     if (Math.abs(canvas.width - newW) > 10) {
       canvas.width = newW;
     }
