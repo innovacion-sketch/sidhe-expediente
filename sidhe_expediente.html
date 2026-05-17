@@ -2278,6 +2278,7 @@ function recolectarDatos() {
     antecedentes: v('antecedentes'),
     cirugias: v('cirugias'),
     lesiones: fractText,
+    fracturas: fractText,
     pisada: v('pisada'),
     motivos: motivos.join(' | '),
     dolor: dolorList.join(' | '),
@@ -2316,7 +2317,7 @@ async function guardarYEnviar() {
     var fileName = ('Sidhe_'+nombre+'_'+datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
     var payload = Object.assign({}, datos, {
-      action: modoEdicion === 'completar_ticket' ? 'updateTicket' : 'saveExpediente',
+      action: modoEdicion === 'completar_ticket' ? 'updateTicket' : 'save',
       id: expedienteEditandoId,
       fileName: fileName,
       pdfBase64: pdfBase64,
@@ -2405,7 +2406,7 @@ async function guardarPendiente() {
     var fileName = ('Sidhe_PEND_'+nombre+'_'+datos.fecha).replace(/[^a-z0-9_\-\.]/gi,'_') + '.pdf';
 
     var payload = Object.assign({}, datos, {
-      action: 'saveExpediente',
+      action: 'save',
       fileName: fileName,
       pdfBase64: pdfBase64,
       ticket_foto_base64: '',
